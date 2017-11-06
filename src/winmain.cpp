@@ -1,3 +1,5 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include "DXApp.h"
 
 
@@ -5,7 +7,7 @@ int WINAPI WinMain(__in HINSTANCE _hinstance, __in_opt HINSTANCE h_previnstance,
     __in LPSTR _lp_cmd_line, __in int _n_show_cmd)
 {
     DXApp app(_hinstance);
-    return app.run();
+    return app.main();
 }
 
 

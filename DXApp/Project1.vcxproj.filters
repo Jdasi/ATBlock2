@@ -5,16 +5,46 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{0e98d69a-ea33-4590-a577-a975753dd33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{7c34b428-d2cd-4a7d-9c50-2f51432ddac7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{8ceb4ea1-28a2-428e-99b0-1e491d8d44ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DXApp.cpp">
+    <ClCompile Include="..\src\DXApp.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="winmain.cpp" />
+    <ClCompile Include="..\src\winmain.cpp" />
+    <ClCompile Include="..\src\Renderer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Window.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\JMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DXApp.h">
+    <ClInclude Include="..\src\DXApp.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Window.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Renderer.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GameData.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\JMath.h">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
