@@ -20,9 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DXApp.cpp" />
-    <ClCompile Include="..\src\JMath.cpp" />
+    <ClCompile Include="..\src\JMathHelper.cpp" />
+    <ClCompile Include="..\src\Matrix.cpp" />
+    <ClCompile Include="..\src\Quaternion.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\Triangle.cpp" />
+    <ClCompile Include="..\src\Vector2.cpp" />
+    <ClCompile Include="..\src\Vector3.cpp" />
+    <ClCompile Include="..\src\Vector4.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
     <ClCompile Include="..\src\winmain.cpp" />
   </ItemGroup>
@@ -30,8 +35,14 @@
     <ClInclude Include="..\src\DXApp.h" />
     <ClInclude Include="..\src\GameData.h" />
     <ClInclude Include="..\src\JMath.h" />
+    <ClInclude Include="..\src\JMathHelper.h" />
+    <ClInclude Include="..\src\Matrix.h" />
+    <ClInclude Include="..\src\Quaternion.h" />
     <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\Triangle.h" />
+    <ClInclude Include="..\src\Vector2.h" />
+    <ClInclude Include="..\src\Vector3.h" />
+    <ClInclude Include="..\src\Vector4.h" />
     <ClInclude Include="..\src\Window.h" />
   </ItemGroup>
   <ItemGroup>
