@@ -1,5 +1,8 @@
+#include <iostream>
+
 #include "DXApp.h"
 #include "JMath.h"
+#include "JTime.h"
 
 
 // Forward declaration of Window Procedure.
@@ -10,6 +13,7 @@ DXApp::DXApp(HINSTANCE _hinstance)
     : hinstance(_hinstance)
     , window(nullptr)
     , renderer(nullptr)
+    , input_handler(nullptr)
 {
 }
 
@@ -33,6 +37,8 @@ bool DXApp::init()
     if (!renderer->init(JMath::Vector4(255, 0, 0, 0)))
         return false;
 
+    input_handler = std::make_unique<InputHandler>();
+
     return true;
 }
 
@@ -42,17 +48,29 @@ int DXApp::run()
     triangle = std::make_unique<Triangle>(renderer.get());
 
     MSG msg = { 0 };
-    while (WM_QUIT != msg.message)
+    while (!game_data.exit)
     {
+        JTime::tick();
+
         if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        if (msg.message == WM_QUIT)
+        {
+            game_data.exit = true;
+        }
         else
         {
-            update();
+            input_handler->processMessage(msg);
+
+            tick();
             render();
+
+            // Needs to be done last to properly record prev key states.
+            input_handler->lateTick();
         }
     }
 
@@ -60,8 +78,27 @@ int DXApp::run()
 }
 
 
-void DXApp::update()
+void DXApp::tick()
 {
+    if (input_handler->getAction(GameAction::LEFT))
+    {
+        std::cout << "a held" << std::endl;
+    }
+
+    if (input_handler->getActionDown(GameAction::LEFT))
+    {
+        std::cout << "a down" << std::endl;
+    }
+
+    if (input_handler->getActionUp(GameAction::LEFT))
+    {
+        std::cout << "a up" << std::endl;
+    }
+
+    if (input_handler->getActionDown(GameAction::QUIT))
+    {
+        game_data.exit = true;
+    }
 }
 
 

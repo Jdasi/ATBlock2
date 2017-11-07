@@ -20,10 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DXApp.cpp" />
+    <ClCompile Include="..\src\InputHandler.cpp" />
     <ClCompile Include="..\src\JMathHelper.cpp" />
+    <ClCompile Include="..\src\JTime.cpp" />
     <ClCompile Include="..\src\Matrix.cpp" />
     <ClCompile Include="..\src\Quaternion.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
+    <ClCompile Include="..\src\SimpleTimer.cpp" />
     <ClCompile Include="..\src\Triangle.cpp" />
     <ClCompile Include="..\src\Vector2.cpp" />
     <ClCompile Include="..\src\Vector3.cpp" />
@@ -33,12 +36,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h" />
+    <ClInclude Include="..\src\GameAction.h" />
     <ClInclude Include="..\src\GameData.h" />
+    <ClInclude Include="..\src\InputHandler.h" />
     <ClInclude Include="..\src\JMath.h" />
     <ClInclude Include="..\src\JMathHelper.h" />
+    <ClInclude Include="..\src\JTime.h" />
+    <ClInclude Include="..\src\Keybinding.h" />
+    <ClInclude Include="..\src\ListenerSubject.h" />
     <ClInclude Include="..\src\Matrix.h" />
     <ClInclude Include="..\src\Quaternion.h" />
     <ClInclude Include="..\src\Renderer.h" />
+    <ClInclude Include="..\src\SimpleTimer.h" />
     <ClInclude Include="..\src\Triangle.h" />
     <ClInclude Include="..\src\Vector2.h" />
     <ClInclude Include="..\src\Vector3.h" />
@@ -124,6 +133,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -149,6 +159,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>RELEASE;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

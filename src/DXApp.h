@@ -7,6 +7,7 @@
 #include "GameData.h"
 #include "Window.h"
 #include "Renderer.h"
+#include "InputHandler.h"
 #include "Triangle.h"
 
 
@@ -20,9 +21,9 @@ public:
 
 private:
     bool init();
-
     int run();
-    void update();
+
+    void tick();
     void render();
 
     // Progam instance.
@@ -31,6 +32,10 @@ private:
     // Systems.
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
+    std::unique_ptr<InputHandler> input_handler;
+
+    // Data.
+    GameData game_data;
 
     // Debug.
     std::unique_ptr<Triangle> triangle;
