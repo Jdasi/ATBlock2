@@ -7,7 +7,7 @@
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 
-Window::Window(HINSTANCE& _instance)
+Window::Window(HINSTANCE _instance)
     : hinstance(_instance)
     , width(0)
     , height(0)
@@ -82,4 +82,16 @@ const UINT& Window::getWidth() const
 const UINT& Window::getHeight() const
 {
     return height;
+}
+
+
+const float Window::getWidthF() const
+{
+    return static_cast<float>(width);
+}
+
+
+const float Window::getHeightF() const
+{
+    return static_cast<float>(height);
 }

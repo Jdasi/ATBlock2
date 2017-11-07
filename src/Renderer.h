@@ -9,7 +9,8 @@ class Window;
 class Renderer
 {
 public:
-    Renderer(Window& _window);
+    Renderer(Window* _window);
+    ~Renderer();
 
     bool init(const JMath::Vector4& _clear_color);
     void setClearColor(const JMath::Vector4& _clear_color);
@@ -23,8 +24,9 @@ public:
 private:
     bool createDevice();
     bool createRenderTarget();
+    bool createDepthStencil();
 
-    Window& window;
+    Window* window;
     JMath::Vector4 clear_color;
 
     // Device stuff.
@@ -32,7 +34,16 @@ private:
     ID3D11Device* d3d_device;
     ID3D11DeviceContext* device_context;
 
+    // Viewport.
+    D3D11_VIEWPORT viewport;
+
     // Render target.
     ID3D11RenderTargetView* target_view;
+
+    // Stencil stuff.
+    ID3D11DepthStencilState* depth_stencil_state;
+    ID3D11RasterizerState* rasterizer_state;
+    ID3D11Texture2D* depth_stencil_buffer;
+    ID3D11DepthStencilView* depth_stencil_view;
 
 };

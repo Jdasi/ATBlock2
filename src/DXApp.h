@@ -25,9 +25,12 @@ private:
     void update();
     void render();
 
+    // Progam instance.
     HINSTANCE hinstance;
-    Window window;
-    Renderer renderer;
+
+    // Systems.
+    std::unique_ptr<Window> window;
+    std::unique_ptr<Renderer> renderer;
 
     // Debug.
     std::unique_ptr<Triangle> triangle;

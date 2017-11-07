@@ -16,7 +16,7 @@ struct Vertex
 
 #define SafeRelease(x) if (x) { x->Release(); x = nullptr; }
 
-Triangle::Triangle(Renderer& _renderer)
+Triangle::Triangle(Renderer* _renderer)
     : vertex_buffer(nullptr)
     , vertex_shader(nullptr)
     , pixel_shader(nullptr)
@@ -36,9 +36,9 @@ Triangle::~Triangle()
 }
 
 
-void Triangle::draw(Renderer& _renderer)
+void Triangle::draw(Renderer* _renderer)
 {
-    auto context = _renderer.getDeviceContext();
+    auto context = _renderer->getDeviceContext();
 
     // Bind triangle shaders.
     context->IASetInputLayout(input_layout);
@@ -55,7 +55,7 @@ void Triangle::draw(Renderer& _renderer)
 }
 
 
-void Triangle::createMesh(Renderer& _renderer)
+void Triangle::createMesh(Renderer* _renderer)
 {
     Vertex vertices[] =
     {
@@ -69,11 +69,11 @@ void Triangle::createMesh(Renderer& _renderer)
     D3D11_SUBRESOURCE_DATA vertex_data = { 0 };
     vertex_data.pSysMem = vertices;
 
-    _renderer.getDevice()->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer);
+    _renderer->getDevice()->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer);
 }
 
 
-void Triangle::createShaders(Renderer& _renderer)
+void Triangle::createShaders(Renderer* _renderer)
 {
     using namespace std;
 
@@ -84,8 +84,8 @@ void Triangle::createShaders(Renderer& _renderer)
     vector<char> vs_data = { istreambuf_iterator<char>(vs_file), istreambuf_iterator<char>() };
     vector<char> ps_data = { istreambuf_iterator<char>(ps_file), istreambuf_iterator<char>() };
 
-    _renderer.getDevice()->CreateVertexShader(vs_data.data(), vs_data.size(), nullptr, &vertex_shader);
-    _renderer.getDevice()->CreatePixelShader(ps_data.data(), ps_data.size(), nullptr, &pixel_shader);
+    _renderer->getDevice()->CreateVertexShader(vs_data.data(), vs_data.size(), nullptr, &vertex_shader);
+    _renderer->getDevice()->CreatePixelShader(ps_data.data(), ps_data.size(), nullptr, &pixel_shader);
 
     // Create input layouts.
     D3D11_INPUT_ELEMENT_DESC layout[] =
@@ -94,5 +94,5 @@ void Triangle::createShaders(Renderer& _renderer)
         { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
-    _renderer.getDevice()->CreateInputLayout(layout, 2, vs_data.data(), vs_data.size(), &input_layout);
+    _renderer->getDevice()->CreateInputLayout(layout, 2, vs_data.data(), vs_data.size(), &input_layout);
 }

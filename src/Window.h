@@ -5,7 +5,7 @@
 class Window
 {
 public:
-    Window(HINSTANCE& _instance);
+    Window(HINSTANCE _instance);
     ~Window() = default;
 
     bool init(const std::string& _title, const int _width, const int _height);
@@ -14,8 +14,11 @@ public:
     const UINT& getWidth() const;
     const UINT& getHeight() const;
 
+    const float getWidthF() const;
+    const float getHeightF() const;
+
 private:
-    HINSTANCE& hinstance;
+    HINSTANCE hinstance;
 
     std::string window_tile;
     UINT width;
