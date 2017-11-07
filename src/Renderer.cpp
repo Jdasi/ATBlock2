@@ -32,8 +32,28 @@ void Renderer::setClearColor(const JMath::Vector4& _clear_color)
 }
 
 
+ID3D11Device* Renderer::getDevice() const
+{
+    return d3d_device;
+}
+
+
+ID3D11DeviceContext* Renderer::getDeviceContext() const
+{
+    return device_context;
+}
+
+
 void Renderer::beginFrame()
 {
+    // Bind render target.
+    device_context->OMSetRenderTargets(1, &target_view, nullptr); // last parameter is depth.
+
+    // Set viewport.
+    auto viewport = CD3D11_VIEWPORT(0.0f, 0.0f, window.getWidth(), window.getHeight());
+    device_context->RSSetViewports(1, &viewport);
+
+    // Set clear color.
     float cc[] = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
     device_context->ClearRenderTargetView(target_view, cc);
 }

@@ -14,6 +14,12 @@
     <Filter Include="Managers">
       <UniqueIdentifier>{8ceb4ea1-28a2-428e-99b0-1e491d8d44ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{bd6b4ea0-c5d8-4d2a-9c67-7453669e0f35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{b6b259f6-d756-4a73-a3e4-35f5cc39861b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DXApp.cpp">
@@ -28,6 +34,9 @@
     </ClCompile>
     <ClCompile Include="..\src\JMath.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Triangle.cpp">
+      <Filter>Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,5 +55,16 @@
     <ClInclude Include="..\src\JMath.h">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Triangle.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Shaders\trianglePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\triangleVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

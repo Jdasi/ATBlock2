@@ -2,10 +2,12 @@
 
 #include <windows.h>
 #include <string>
+#include <memory>
 
 #include "GameData.h"
 #include "Window.h"
 #include "Renderer.h"
+#include "Triangle.h"
 
 
 class DXApp
@@ -26,5 +28,9 @@ private:
     HINSTANCE hinstance;
     Window window;
     Renderer renderer;
+
+    // Debug.
+    std::unique_ptr<Triangle> triangle;
+
 
 };

@@ -71,3 +71,15 @@ HWND& Window::getHandle()
 {
     return hwnd;
 }
+
+
+const UINT& Window::getWidth() const
+{
+    return width;
+}
+
+
+const UINT& Window::getHeight() const
+{
+    return height;
+}

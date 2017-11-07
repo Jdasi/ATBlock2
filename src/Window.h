@@ -11,6 +11,8 @@ public:
     bool init(const std::string& _title, const int _width, const int _height);
 
     HWND& getHandle();
+    const UINT& getWidth() const;
+    const UINT& getHeight() const;
 
 private:
     HINSTANCE& hinstance;

@@ -37,6 +37,8 @@ bool DXApp::init()
 
 int DXApp::run()
 {
+    triangle = std::make_unique<Triangle>(renderer);
+
     MSG msg = { 0 };
     while (WM_QUIT != msg.message)
     {
@@ -66,6 +68,7 @@ void DXApp::render()
     renderer.beginFrame();
 
     // render all ...
+    triangle->draw(renderer);
 
     renderer.endFrame();
 }

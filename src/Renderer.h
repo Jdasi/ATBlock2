@@ -14,6 +14,9 @@ public:
     bool init(const JMath::Vector4& _clear_color);
     void setClearColor(const JMath::Vector4& _clear_color);
 
+    ID3D11Device* getDevice() const;
+    ID3D11DeviceContext* getDeviceContext() const;
+
     void beginFrame();
     void endFrame();
 
