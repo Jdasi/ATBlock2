@@ -41,6 +41,9 @@
     <ClCompile Include="..\src\SimpleTimer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Square.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -73,12 +76,21 @@
     <ClInclude Include="..\src\Keybinding.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\DXUtil.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Vertex.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Square.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Shaders\trianglePixelShader.hlsl">
+    <FxCompile Include="..\Shaders\PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\Shaders\triangleVertexShader.hlsl">
+    <FxCompile Include="..\Shaders\VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

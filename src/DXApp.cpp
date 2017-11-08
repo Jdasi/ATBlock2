@@ -35,7 +35,7 @@ bool DXApp::init()
         return false;
 
     renderer = std::make_unique<Renderer>(window.get());
-    if (!renderer->init(DirectX::XMFLOAT4(255, 0, 0, 0)))
+    if (!renderer->init(DirectX::XMFLOAT4(0.2f, 0.2f, 0.6f, 1)))
         return false;
 
     input_handler = std::make_unique<InputHandler>();
@@ -47,6 +47,7 @@ bool DXApp::init()
 int DXApp::run()
 {
     triangle = std::make_unique<Triangle>(renderer.get());
+    square = std::make_unique<Square>(renderer.get());
 
     MSG msg = { 0 };
     while (!game_data.exit)
@@ -108,7 +109,8 @@ void DXApp::render()
     renderer->beginFrame();
 
     // render all ...
-    triangle->draw(renderer.get());
+    //triangle->draw(renderer.get());
+    square->draw(renderer.get());
 
     renderer->endFrame();
 }

@@ -1,8 +1,7 @@
 #include "Renderer.h"
 #include "Window.h"
+#include "DXUtil.h"
 
-
-#define SafeRelease(x) if (x) { x->Release(); x = nullptr; }
 
 Renderer::Renderer(Window* _window)
     : window(_window)
@@ -21,14 +20,14 @@ Renderer::Renderer(Window* _window)
 
 Renderer::~Renderer()
 {
-    SafeRelease(swap_chain);
-    SafeRelease(d3d_device);
-    SafeRelease(device_context);
-    SafeRelease(target_view);
-    SafeRelease(depth_stencil_state);
-    SafeRelease(rasterizer_state);
-    SafeRelease(depth_stencil_buffer);
-    SafeRelease(depth_stencil_view);
+    SAFE_RELEASE(swap_chain);
+    SAFE_RELEASE(d3d_device);
+    SAFE_RELEASE(device_context);
+    SAFE_RELEASE(target_view);
+    SAFE_RELEASE(depth_stencil_state);
+    SAFE_RELEASE(rasterizer_state);
+    SAFE_RELEASE(depth_stencil_buffer);
+    SAFE_RELEASE(depth_stencil_view);
 }
 
 
@@ -158,6 +157,7 @@ bool Renderer::createDepthStencil()
 
     if (FAILED(hr))
         return false; // Failed to create depth stencil state.
+
 
     device_context->OMSetDepthStencilState(depth_stencil_state, 1);
 

@@ -8,7 +8,9 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "InputHandler.h"
+
 #include "Triangle.h"
+#include "Square.h"
 
 
 class DXApp
@@ -39,6 +41,7 @@ private:
 
     // Debug.
     std::unique_ptr<Triangle> triangle;
+    std::unique_ptr<Square> square;
 
 
 };
