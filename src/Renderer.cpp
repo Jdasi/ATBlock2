@@ -10,8 +10,6 @@ Renderer::Renderer(Window* _window)
     , device_context(nullptr)
     , viewport({ 0.f, 0.f, _window->getWidthF(), _window->getHeightF(), 0.0f, 1.0f })
     , target_view(nullptr)
-    , depth_stencil_state(nullptr)
-    , rasterizer_state(nullptr)
     , depth_stencil_buffer(nullptr)
     , depth_stencil_view(nullptr)
 {
@@ -24,8 +22,6 @@ Renderer::~Renderer()
     SAFE_RELEASE(d3d_device);
     SAFE_RELEASE(device_context);
     SAFE_RELEASE(target_view);
-    SAFE_RELEASE(depth_stencil_state);
-    SAFE_RELEASE(rasterizer_state);
     SAFE_RELEASE(depth_stencil_buffer);
     SAFE_RELEASE(depth_stencil_view);
 }
@@ -68,15 +64,12 @@ ID3D11DeviceContext* Renderer::getDeviceContext() const
 
 void Renderer::beginFrame()
 {
-    // Bind render target.
-    device_context->OMSetRenderTargets(1, &target_view, depth_stencil_view);
-
     // Set clear color.
     float cc[] = { clear_color.x, clear_color.y, clear_color.z, clear_color.w };
     device_context->ClearRenderTargetView(target_view, cc);
 
     // Clear depth stencil.
-    device_context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0x00);
+    device_context->ClearDepthStencilView(depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     // Set viewport.
     device_context->RSSetViewports(1, &viewport);
@@ -127,6 +120,9 @@ bool Renderer::createRenderTarget()
 
     back_buffer->Release();
 
+    // Bind render target.
+    device_context->OMSetRenderTargets(1, &target_view, depth_stencil_view);
+
     return true;
 }
 
@@ -135,31 +131,23 @@ bool Renderer::createDepthStencil()
 {
     HRESULT hr = {};
 
-    D3D11_DEPTH_STENCIL_DESC depth_stencil_desc = { 0 };
-    depth_stencil_desc.DepthEnable = true;
-    depth_stencil_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    depth_stencil_desc.DepthFunc = D3D11_COMPARISON_LESS;
-    depth_stencil_desc.StencilEnable = false;
-    depth_stencil_desc.StencilWriteMask = 0xFFu;
-    depth_stencil_desc.StencilReadMask = 0xFFu;
+    D3D11_TEXTURE2D_DESC depthStencilDesc;
 
-    depth_stencil_desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    depth_stencil_desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-    depth_stencil_desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    depth_stencil_desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    depthStencilDesc.Width = window->getWidth();
+    depthStencilDesc.Height = window->getHeight();
+    depthStencilDesc.MipLevels = 1;
+    depthStencilDesc.ArraySize = 1;
+    depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthStencilDesc.SampleDesc.Count = 1;
+    depthStencilDesc.SampleDesc.Quality = 0;
+    depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depthStencilDesc.CPUAccessFlags = 0;
+    depthStencilDesc.MiscFlags = 0;
 
-    depth_stencil_desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-    depth_stencil_desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-    depth_stencil_desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-    depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-    hr = d3d_device->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state);
-
-    if (FAILED(hr))
-        return false; // Failed to create depth stencil state.
-
-
-    device_context->OMSetDepthStencilState(depth_stencil_state, 1);
+    //Create the Depth/Stencil View
+    d3d_device->CreateTexture2D(&depthStencilDesc, NULL, &depth_stencil_buffer);
+    d3d_device->CreateDepthStencilView(depth_stencil_buffer, NULL, &depth_stencil_view);
 
     return true;
 }
