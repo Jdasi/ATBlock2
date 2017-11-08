@@ -1,7 +1,7 @@
 struct Input
 {
     float3 position : POSITION;
-    float3 color : COLOR;
+    float4 color : COLOR;
 };
 
 float4 main(Input input) : SV_TARGET

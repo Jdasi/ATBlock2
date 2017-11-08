@@ -19,13 +19,13 @@ struct Vertex
     {}
 
     Vertex(const float _x, const float _y, const float _z,
-        const float _r, const float _g, const float _b)
+        const float _cr, const float _cg, const float _cb, const float _ca)
         : pos(_x, _y, _z)
-        , color(_r, _g, _b)
+        , color(_cr, _cg, _cb, _ca)
     {}
 
     DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT3 color;
+    DirectX::XMFLOAT4 color;
 };
 
 #define SafeRelease(x) if (x) { x->Release(); x = nullptr; }
@@ -74,17 +74,18 @@ void Triangle::createMesh(Renderer* _renderer)
 {
     Vertex v[] =
     {
-        Vertex(0.0f, 0.5f, 0.5f, 1, 0, 0),
-        Vertex(0.5f, -0.5f, 0.5f, 0, 1, 0),
-        Vertex(-0.5f, -0.5f, 0.5f, 0, 0, 1)
+        Vertex( 0.0f,  0.5f, 0.5f, 1, 0, 0, 1),
+        Vertex( 0.5f, -0.5f, 0.5f, 0, 1, 0, 1),
+        Vertex(-0.5f, -0.5f, 0.5f, 0, 0, 1, 1)
     };
+    UINT num_elems = ARRAYSIZE(v);
 
     // Create vertex buffer.
     auto vertex_buffer_desc = CD3D11_BUFFER_DESC(sizeof(v), D3D11_BIND_VERTEX_BUFFER);
     ZeroMemory(&vertex_buffer_desc, sizeof(vertex_buffer_desc));
 
     vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-    vertex_buffer_desc.ByteWidth = sizeof(Vertex) * 4;
+    vertex_buffer_desc.ByteWidth = sizeof(Vertex) * num_elems;
     vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vertex_buffer_desc.CPUAccessFlags = 0;
     vertex_buffer_desc.MiscFlags = 0;
@@ -114,7 +115,7 @@ void Triangle::createShaders(Renderer* _renderer)
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
     _renderer->getDevice()->CreateInputLayout(layout, 2, vs_data.data(), vs_data.size(), &input_layout);
