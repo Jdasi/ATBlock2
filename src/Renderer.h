@@ -1,8 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
-
-#include "JMath.h"
+#include <DirectXMath.h>
 
 class Window;
 
@@ -12,8 +11,8 @@ public:
     Renderer(Window* _window);
     ~Renderer();
 
-    bool init(const JMath::Vector4& _clear_color);
-    void setClearColor(const JMath::Vector4& _clear_color);
+    bool init(const DirectX::XMFLOAT4& _clear_color);
+    void setClearColor(const DirectX::XMFLOAT4& _clear_color);
 
     ID3D11Device* getDevice() const;
     ID3D11DeviceContext* getDeviceContext() const;
@@ -27,7 +26,7 @@ private:
     bool createDepthStencil();
 
     Window* window;
-    JMath::Vector4 clear_color;
+    DirectX::XMFLOAT4 clear_color;
 
     // Device stuff.
     IDXGISwapChain* swap_chain;

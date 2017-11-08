@@ -32,7 +32,7 @@ Renderer::~Renderer()
 }
 
 
-bool Renderer::init(const JMath::Vector4& _clear_color)
+bool Renderer::init(const DirectX::XMFLOAT4& _clear_color)
 {
     if (!createDevice())
         return false;
@@ -49,7 +49,7 @@ bool Renderer::init(const JMath::Vector4& _clear_color)
 }
 
 
-void Renderer::setClearColor(const JMath::Vector4& _clear_color)
+void Renderer::setClearColor(const DirectX::XMFLOAT4& _clear_color)
 {
     clear_color = _clear_color;
 }

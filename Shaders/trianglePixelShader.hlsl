@@ -1,6 +1,6 @@
 struct Input
 {
-    float2 position : POSITION;
+    float3 position : POSITION;
     float3 color : COLOR;
 };
 

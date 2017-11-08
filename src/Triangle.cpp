@@ -1,17 +1,31 @@
 #include <fstream>
 #include <vector>
 
+#include <DirectXMath.h>
+
 #include "Triangle.h"
 
 
 struct Vertex
 {
-    float x;
-    float y;
+    Vertex()
+        : pos()
+        , color()
+    {}
 
-    float r;
-    float g;
-    float b;
+    Vertex(const float _x, const float _y, const float _z)
+        : pos(_x, _y, _z)
+        , color()
+    {}
+
+    Vertex(const float _x, const float _y, const float _z,
+        const float _r, const float _g, const float _b)
+        : pos(_x, _y, _z)
+        , color(_r, _g, _b)
+    {}
+
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT3 color;
 };
 
 #define SafeRelease(x) if (x) { x->Release(); x = nullptr; }
@@ -49,6 +63,7 @@ void Triangle::draw(Renderer* _renderer)
     UINT stride = sizeof(Vertex); // How far to move in memory.
     UINT offset = 0;
     context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // Draw.
     context->Draw(3, 0);
@@ -57,17 +72,25 @@ void Triangle::draw(Renderer* _renderer)
 
 void Triangle::createMesh(Renderer* _renderer)
 {
-    Vertex vertices[] =
+    Vertex v[] =
     {
-        { -1, -1, 1, 0, 0 },
-        {  0,  1, 0, 1, 0 },
-        {  1, -1, 0, 0, 1 }
+        Vertex(0.0f, 0.5f, 0.5f, 1, 0, 0),
+        Vertex(0.5f, -0.5f, 0.5f, 0, 1, 0),
+        Vertex(-0.5f, -0.5f, 0.5f, 0, 0, 1)
     };
 
     // Create vertex buffer.
-    auto vertex_buffer_desc = CD3D11_BUFFER_DESC(sizeof(vertices), D3D11_BIND_VERTEX_BUFFER);
+    auto vertex_buffer_desc = CD3D11_BUFFER_DESC(sizeof(v), D3D11_BIND_VERTEX_BUFFER);
+    ZeroMemory(&vertex_buffer_desc, sizeof(vertex_buffer_desc));
+
+    vertex_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
+    vertex_buffer_desc.ByteWidth = sizeof(Vertex) * 4;
+    vertex_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vertex_buffer_desc.CPUAccessFlags = 0;
+    vertex_buffer_desc.MiscFlags = 0;
+
     D3D11_SUBRESOURCE_DATA vertex_data = { 0 };
-    vertex_data.pSysMem = vertices;
+    vertex_data.pSysMem = v;
 
     _renderer->getDevice()->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer);
 }
@@ -90,7 +113,7 @@ void Triangle::createShaders(Renderer* _renderer)
     // Create input layouts.
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
-        { "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 

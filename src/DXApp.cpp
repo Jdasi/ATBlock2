@@ -1,7 +1,8 @@
 #include <iostream>
 
+#include <DirectXMath.h>
+
 #include "DXApp.h"
-#include "JMath.h"
 #include "JTime.h"
 
 
@@ -34,7 +35,7 @@ bool DXApp::init()
         return false;
 
     renderer = std::make_unique<Renderer>(window.get());
-    if (!renderer->init(JMath::Vector4(255, 0, 0, 0)))
+    if (!renderer->init(DirectX::XMFLOAT4(255, 0, 0, 0)))
         return false;
 
     input_handler = std::make_unique<InputHandler>();

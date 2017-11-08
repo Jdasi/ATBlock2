@@ -8,9 +8,6 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{0e98d69a-ea33-4590-a577-a975753dd33d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Math">
-      <UniqueIdentifier>{7c34b428-d2cd-4a7d-9c50-2f51432ddac7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Managers">
       <UniqueIdentifier>{8ceb4ea1-28a2-428e-99b0-1e491d8d44ff}</UniqueIdentifier>
     </Filter>
@@ -35,24 +32,6 @@
     <ClCompile Include="..\src\Triangle.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Matrix.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Quaternion.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vector2.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vector3.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Vector4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\JMathHelper.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\InputHandler.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -76,35 +55,11 @@
     <ClInclude Include="..\src\GameData.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\JMath.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Triangle.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Matrix.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Quaternion.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Vector2.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Vector3.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Vector4.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\JMathHelper.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\InputHandler.h">
       <Filter>Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ListenerSubject.h">
-      <Filter>Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\src\JTime.h">
       <Filter>Utility</Filter>
