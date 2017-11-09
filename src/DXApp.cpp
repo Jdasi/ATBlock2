@@ -39,6 +39,7 @@ bool DXApp::init()
         return false;
 
     input_handler = std::make_unique<InputHandler>();
+    draw_data.renderer = renderer.get();
 
     return true;
 }

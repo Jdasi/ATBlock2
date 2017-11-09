@@ -17,6 +17,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{b6b259f6-d756-4a73-a3e4-35f5cc39861b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{9e6115b0-d96a-4bf2-be74-a5f5b1fd3159}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DXApp.cpp">
@@ -43,6 +46,15 @@
     </ClCompile>
     <ClCompile Include="..\src\Square.cpp">
       <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Cube.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Camera.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GameObject.cpp">
+      <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +96,21 @@
     </ClInclude>
     <ClInclude Include="..\src\Square.h">
       <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Cube.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Camera.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GameObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DrawData.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DXMathHelper.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

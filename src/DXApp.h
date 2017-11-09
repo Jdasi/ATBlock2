@@ -4,10 +4,11 @@
 #include <string>
 #include <memory>
 
-#include "GameData.h"
 #include "Window.h"
 #include "Renderer.h"
 #include "InputHandler.h"
+#include "GameData.h"
+#include "DrawData.h"
 
 #include "Triangle.h"
 #include "Square.h"
@@ -38,6 +39,7 @@ private:
 
     // Data.
     GameData game_data;
+    DrawData draw_data;
 
     // Debug.
     std::unique_ptr<Triangle> triangle;
