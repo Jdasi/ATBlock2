@@ -6,16 +6,17 @@
 
 
 Camera::Camera(const float _fov, const float _ar, const float _near, const float _far,
-    const DirectX::XMFLOAT3 _up, const DirectX::XMFLOAT3& _target)
-    : field_of_view(_fov)
+    const DirectX::XMFLOAT3& _up, const DirectX::XMFLOAT3& _target)
+    : GameObject()
+    , proj_mat(DirectX::XMMatrixIdentity())
+    , view_mat(DirectX::XMMatrixIdentity())
+    , field_of_view(_fov)
     , aspect_ratio(_ar)
     , near_plane(_near)
     , far_plane(_far)
     , up(_up)
     , target(_target)
 {
-    proj_mat = DirectX::XMMatrixIdentity();
-    view_mat = DirectX::XMMatrixIdentity();
 }
 
 

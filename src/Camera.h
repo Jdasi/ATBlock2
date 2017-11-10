@@ -2,13 +2,11 @@
 
 #include "GameObject.h"
 
-const 
-
 class Camera : public GameObject
 {
 public:
     Camera(const float _fov, const float _ar, const float _near, const float _far,
-        const DirectX::XMFLOAT3 _up = DirectX::Vector3Up, const DirectX::XMFLOAT3& _target = DirectX::Vector3Zero);
+        const DirectX::XMFLOAT3& _up = DirectX::Vector3Up, const DirectX::XMFLOAT3& _target = DirectX::Vector3Zero);
 
     ~Camera() = default;
 

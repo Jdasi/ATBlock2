@@ -24,7 +24,6 @@ Renderer::~Renderer()
     SAFE_RELEASE(target_view);
     SAFE_RELEASE(depth_stencil_buffer);
     SAFE_RELEASE(depth_stencil_view);
-    SAFE_RELEASE(raster_state);
 }
 
 
@@ -163,23 +162,6 @@ bool Renderer::createDepthStencil()
     //Create the Depth/Stencil View
     d3d_device->CreateTexture2D(&depthStencilDesc, NULL, &depth_stencil_buffer);
     d3d_device->CreateDepthStencilView(depth_stencil_buffer, NULL, &depth_stencil_view);
-
-    // Set up Raster State.
-    D3D11_RASTERIZER_DESC raster_desc;
-    raster_desc.AntialiasedLineEnable = false;
-    raster_desc.CullMode = D3D11_CULL_BACK;
-    raster_desc.DepthBias = 0;
-    raster_desc.DepthBiasClamp = 0.0f;
-    raster_desc.DepthClipEnable = true;
-    raster_desc.FillMode = D3D11_FILL_SOLID;
-    raster_desc.FrontCounterClockwise = false;
-    raster_desc.MultisampleEnable = false;
-    raster_desc.ScissorEnable = false;
-    raster_desc.SlopeScaledDepthBias = 0.0f;
-
-    // Create Raster State and use it.
-    d3d_device->CreateRasterizerState(&raster_desc, &raster_state);
-    device_context->RSSetState(raster_state);
 
     return true;
 }

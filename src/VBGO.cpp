@@ -4,7 +4,8 @@
 
 
 VBGO::VBGO(Renderer* _renderer)
-    : vertex_buffer(nullptr)
+    : GameObject()
+    , vertex_buffer(nullptr)
     , index_buffer(nullptr)
     , cb_gpu(nullptr)
     , cb_cpu(nullptr)
