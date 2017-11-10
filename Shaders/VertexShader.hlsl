@@ -1,3 +1,8 @@
+cbuffer ConstantBuffer
+{
+    float4x4 wvp;
+};
+
 struct Input
 {
     float3 position : POSITION;
@@ -10,11 +15,13 @@ struct Output
     float4 color : COLOR;
 };
 
-Output main (Input input)
+Output main(Input input)
 {
     Output output;
 
-    output.position = float4(input.position.x, input.position.y, input.position.z, 1);
+    float4 pos = float4(input.position.x, input.position.y, input.position.z, 1);
+    output.position = pos;
+    //output.position = mul(pos, wvp);
     output.color = input.color;
 
     return output;

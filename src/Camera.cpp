@@ -21,16 +21,17 @@ void Camera::tick(GameData* _gd)
 
     if (mat_dirty)
     {
-        mat_dirty = false;
-
         proj_mat = DirectX::XMMatrixPerspectiveFovLH(field_of_view, aspect_ratio, near_plane, far_plane);
 
         XMVECTOR eyev = XMLoadFloat3(&position);
         XMVECTOR targetv = XMLoadFloat3(&target);
         XMVECTOR upv = XMLoadFloat3(&up);
 
-        view_mat = XMMatrixLookAtRH(eyev, targetv, upv);
+        view_mat = XMMatrixLookAtLH(eyev, targetv, upv);
     }
+
+    // Base class will clear dirty status.
+    GameObject::tick(_gd);
 }
 
 

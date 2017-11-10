@@ -44,9 +44,6 @@
     <ClCompile Include="..\src\SimpleTimer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Square.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Cube.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
       <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="..\src\GameObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBGO.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
@@ -94,9 +94,6 @@
     <ClInclude Include="..\src\Vertex.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Square.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Cube.h">
       <Filter>Assets</Filter>
     </ClInclude>
@@ -111,6 +108,12 @@
     </ClInclude>
     <ClInclude Include="..\src\DXMathHelper.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBGO.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Core.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,23 +1,20 @@
 #pragma once
 
-#include "Renderer.h"
+#include "VBGO.h"
 
-class Cube
+class Cube final : public VBGO
 {
 public:
     Cube(Renderer* _renderer);
-    ~Cube();
+    ~Cube() = default;
 
-    void draw(Renderer* _renderer);
+    void tick(GameData* _gd) override;
+    void draw(DrawData* _dd) override;
+
+protected:
+    void createMesh(Renderer* _renderer) override;
 
 private:
-    void createMesh(Renderer* _renderer);
-    void createShaders(Renderer* _renderer);
 
-    ID3D11Buffer* vertex_buffer;
-    ID3D11Buffer* index_buffer;
-    ID3D11VertexShader* vertex_shader;
-    ID3D11PixelShader* pixel_shader;
-    ID3D11InputLayout* input_layout;
 
 };

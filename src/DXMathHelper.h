@@ -13,4 +13,3 @@ namespace DirectX
     static const XMFLOAT3 Vector3Forward   = {  0.f,  0.f, -1.f };
     static const XMFLOAT3 Vector3Backward  = {  0.f,  0.f,  1.f };
 }
-

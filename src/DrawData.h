@@ -1,12 +1,15 @@
 #pragma once
 
-#include "Renderer.h"
+class Renderer;
+class Camera;
 
 struct DrawData
 {
     DrawData()
         : renderer(nullptr)
+        , camera(nullptr)
     {}
 
     Renderer* renderer;
+    Camera* camera;
 };

@@ -2,17 +2,21 @@
 
 #include <DirectXMath.h>
 
+struct ConstantBuffer
+{
+    DirectX::XMMATRIX wvp;
+};
 
 struct Vertex
 {
     Vertex()
-        : pos()
-        , color()
+        : pos(0, 0, 0)
+        , color(1, 1, 1, 1)
     {}
 
     Vertex(const float _x, const float _y, const float _z)
         : pos(_x, _y, _z)
-        , color()
+        , color(1, 1, 1, 1)
     {}
 
     Vertex(const float _x, const float _y, const float _z,

@@ -2,6 +2,8 @@
 
 
 GameObject::GameObject()
+    : visible(true)
+    , mat_dirty(true)
 {
     world_mat = DirectX::XMMatrixIdentity();
 }
@@ -27,6 +29,24 @@ void GameObject::tick(GameData* _gd)
 void GameObject::draw(DrawData* _dd)
 {
     // Base class draws nothing.
+}
+
+
+bool GameObject::isVisible() const
+{
+    return visible;
+}
+
+
+void GameObject::setVisible(const bool _visible)
+{
+    visible = _visible;
+}
+
+
+const DirectX::XMMATRIX& GameObject::getWorld() const
+{
+    return world_mat;
 }
 
 

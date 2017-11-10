@@ -1,18 +1,13 @@
 #pragma once
 
 #include <windows.h>
-#include <string>
 #include <memory>
+#include <vector>
 
-#include "Window.h"
-#include "Renderer.h"
-#include "InputHandler.h"
-#include "GameData.h"
-#include "DrawData.h"
-
+#include "Core.h"
+#include "Camera.h"
 #include "Triangle.h"
-#include "Square.h"
-
+#include "Cube.h"
 
 class DXApp
 {
@@ -24,6 +19,7 @@ public:
 
 private:
     bool init();
+    void initObjects();
     int run();
 
     void tick();
@@ -41,9 +37,8 @@ private:
     GameData game_data;
     DrawData draw_data;
 
-    // Debug.
-    std::unique_ptr<Triangle> triangle;
-    std::unique_ptr<Square> square;
-
+    // Objects.
+    std::unique_ptr<Camera> camera;
+    std::vector<std::unique_ptr<GameObject>> game_objects;
 
 };

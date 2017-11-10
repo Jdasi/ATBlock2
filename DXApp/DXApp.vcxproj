@@ -27,13 +27,14 @@
     <ClCompile Include="..\src\JTime.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\SimpleTimer.cpp" />
-    <ClCompile Include="..\src\Square.cpp" />
     <ClCompile Include="..\src\Triangle.cpp" />
+    <ClCompile Include="..\src\VBGO.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
     <ClCompile Include="..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h" />
+    <ClInclude Include="..\src\Core.h" />
     <ClInclude Include="..\src\Cube.h" />
     <ClInclude Include="..\src\DrawData.h" />
     <ClInclude Include="..\src\DXApp.h" />
@@ -47,8 +48,8 @@
     <ClInclude Include="..\src\Keybinding.h" />
     <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\SimpleTimer.h" />
-    <ClInclude Include="..\src\Square.h" />
     <ClInclude Include="..\src\Triangle.h" />
+    <ClInclude Include="..\src\VBGO.h" />
     <ClInclude Include="..\src\Vertex.h" />
     <ClInclude Include="..\src\Window.h" />
   </ItemGroup>

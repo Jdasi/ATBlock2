@@ -1,5 +1,3 @@
-#include <Windows.h>
-
 #include "Window.h"
 
 
@@ -94,4 +92,10 @@ const float Window::getWidthF() const
 const float Window::getHeightF() const
 {
     return static_cast<float>(height);
+}
+
+
+const float Window::getAspectRatio() const
+{
+    return width / height;
 }

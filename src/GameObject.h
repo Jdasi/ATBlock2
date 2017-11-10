@@ -1,18 +1,20 @@
 #pragma once
 
-#include "DXMathHelper.h"
-
-struct GameData;
-struct DrawData;
+#include "Core.h"
 
 class GameObject
 {
 public:
     GameObject();
-    ~GameObject() = default;
+    virtual ~GameObject() = default;
 
     virtual void tick(GameData* _gd);
     virtual void draw(DrawData* _dd);
+
+    bool isVisible() const;
+    void setVisible(const bool _visible);
+
+    const DirectX::XMMATRIX& getWorld() const;
 
     const DirectX::XMFLOAT3& getPos() const;
     void setPos(const DirectX::XMFLOAT3& _pos);
@@ -35,6 +37,8 @@ public:
     void setYawPitchRoll(const float _yaw, const float _pitch, const float _roll);
 
 protected:
+    bool visible;
+
     DirectX::XMMATRIX world_mat;
     DirectX::XMFLOAT3 position;
     DirectX::XMFLOAT3 scale;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 #include <string>
 
 class Window
@@ -16,6 +17,7 @@ public:
 
     const float getWidthF() const;
     const float getHeightF() const;
+    const float getAspectRatio() const;
 
 private:
     HINSTANCE hinstance;

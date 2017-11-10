@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include <DirectXMath.h>
-
 #include "DXApp.h"
 #include "JTime.h"
 
@@ -39,17 +37,31 @@ bool DXApp::init()
         return false;
 
     input_handler = std::make_unique<InputHandler>();
-    draw_data.renderer = renderer.get();
+
+    initObjects();
 
     return true;
 }
 
 
+void DXApp::initObjects()
+{
+    camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
+    camera->setPos(0, 0, -0.5f);
+
+    auto triangle = std::make_unique<Triangle>(renderer.get());
+    game_objects.push_back(std::move(triangle));
+
+    //auto cube = std::make_unique<Cube>(renderer.get());
+    //game_objects.push_back(std::move(cube));
+
+    draw_data.renderer = renderer.get();
+    draw_data.camera = camera.get();
+}
+
+
 int DXApp::run()
 {
-    triangle = std::make_unique<Triangle>(renderer.get());
-    square = std::make_unique<Square>(renderer.get());
-
     MSG msg = { 0 };
     while (!game_data.exit)
     {
@@ -67,6 +79,7 @@ int DXApp::run()
         }
         else
         {
+            // Handle input first.
             input_handler->processMessage(msg);
 
             tick();
@@ -83,19 +96,11 @@ int DXApp::run()
 
 void DXApp::tick()
 {
-    if (input_handler->getAction(GameAction::LEFT))
-    {
-        std::cout << "a held" << std::endl;
-    }
+    camera->tick(&game_data);
 
-    if (input_handler->getActionDown(GameAction::LEFT))
+    for (auto& go : game_objects)
     {
-        std::cout << "a down" << std::endl;
-    }
-
-    if (input_handler->getActionUp(GameAction::LEFT))
-    {
-        std::cout << "a up" << std::endl;
+        go->tick(&game_data);
     }
 
     if (input_handler->getActionDown(GameAction::QUIT))
@@ -109,9 +114,10 @@ void DXApp::render()
 {
     renderer->beginFrame();
 
-    // render all ...
-    //triangle->draw(renderer.get());
-    square->draw(renderer.get());
+    for (auto& go : game_objects)
+    {
+        go->draw(&draw_data);
+    }
 
     renderer->endFrame();
 }
