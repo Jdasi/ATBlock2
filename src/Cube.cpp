@@ -1,4 +1,5 @@
 #include "Cube.h"
+#include "Camera.h"
 
 
 Cube::Cube(Renderer* _renderer)
@@ -31,15 +32,12 @@ void Cube::draw(DrawData* _dd)
     context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    /*
     // Update constant buffer.
-    DirectX::XMMATRIX wvp = DirectX::XMMatrixIdentity() * _dd->camera->getViewMat() * _dd->camera->getProjMat();
-
+    DirectX::XMMATRIX wvp = world_mat * _dd->camera->getViewMat() * _dd->camera->getProjMat();
     cb_cpu->wvp = XMMatrixTranspose(wvp);
 
     context->UpdateSubresource(cb_gpu, 0, NULL, &cb_cpu, 0, 0);
     context->VSSetConstantBuffers(0, 1, &cb_gpu);
-    */
 
     // Draw.
     context->DrawIndexed(num_indices, 0, 0);
@@ -53,10 +51,10 @@ void Cube::createMesh(Renderer* _renderer)
 
     Vertex vertices[] =
     {
-        Vertex(-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f),
-        Vertex(-0.5f,  0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f),
-        Vertex( 0.5f,  0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f),
-        Vertex( 0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, 0.4f,     1.0f, 0.0f, 0.0f, 1.0f),
+        Vertex(-0.5f,  0.5f, 0.4f,     0.0f, 1.0f, 0.0f, 1.0f),
+        Vertex( 0.5f,  0.5f, 0.4f,     0.0f, 0.0f, 1.0f, 1.0f),
+        Vertex( 0.5f, -0.5f, 0.4f,     0.0f, 1.0f, 0.0f, 1.0f),
     };
     num_vertices = ARRAYSIZE(vertices);
 

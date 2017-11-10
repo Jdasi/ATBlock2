@@ -1,4 +1,8 @@
+#include <iostream>
+
 #include "Camera.h"
+#include "InputHandler.h"
+#include "JTime.h"
 
 
 Camera::Camera(const float _fov, const float _ar, const float _near, const float _far,
@@ -18,6 +22,8 @@ Camera::Camera(const float _fov, const float _ar, const float _near, const float
 void Camera::tick(GameData* _gd)
 {
     using namespace DirectX;
+
+    handleInput(_gd);
 
     if (mat_dirty)
     {
@@ -44,4 +50,26 @@ const DirectX::XMMATRIX& Camera::getProjMat() const
 const DirectX::XMMATRIX& Camera::getViewMat() const
 {
     return view_mat;
+}
+
+
+void Camera::handleInput(GameData* _gd)
+{
+    float move_speed = 10;
+    float rot_speed = 10;
+
+    if (_gd->input_handler->getAction(GameAction::FORWARD))
+    {
+        position.z += move_speed * JTime::getDeltaTime();
+        mat_dirty = true;
+
+        std::cout << position.z << std::endl;
+    }
+    else if (_gd->input_handler->getAction(GameAction::BACKWARD))
+    {
+        position.z -= move_speed * JTime::getDeltaTime();
+        mat_dirty = true;
+
+        std::cout << position.z << std::endl;
+    }
 }

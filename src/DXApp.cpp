@@ -47,14 +47,18 @@ bool DXApp::init()
 void DXApp::initObjects()
 {
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
-    camera->setPos(0, 0, -0.5f);
+    camera->setPos(0, 0, -10.0f);
+
+    auto cube = std::make_unique<Cube>(renderer.get());
+    game_objects.push_back(std::move(cube));
 
     auto triangle = std::make_unique<Triangle>(renderer.get());
     game_objects.push_back(std::move(triangle));
 
-    //auto cube = std::make_unique<Cube>(renderer.get());
-    //game_objects.push_back(std::move(cube));
+    // Game Data stuff.
+    game_data.input_handler = input_handler.get();
 
+    // Draw Data stuff.
     draw_data.renderer = renderer.get();
     draw_data.camera = camera.get();
 }

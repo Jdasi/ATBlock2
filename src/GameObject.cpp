@@ -4,8 +4,12 @@
 GameObject::GameObject()
     : visible(true)
     , mat_dirty(true)
+    , world_mat(DirectX::XMMatrixIdentity())
+    , scale(1, 1, 1)
+    , yaw(0)
+    , pitch(0)
+    , roll(0)
 {
-    world_mat = DirectX::XMMatrixIdentity();
 }
 
 

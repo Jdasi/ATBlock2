@@ -18,6 +18,8 @@ public:
     const DirectX::XMMATRIX& getViewMat() const;
 
 protected:
+    void handleInput(GameData* _gd);
+
     DirectX::XMMATRIX proj_mat;
     DirectX::XMMATRIX view_mat;
 

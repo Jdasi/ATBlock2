@@ -1,5 +1,7 @@
 #pragma once
 
+class InputHandler;
+
 struct GameData
 {
     GameData()
@@ -7,4 +9,6 @@ struct GameData
     {}
 
     bool exit;
+
+    InputHandler* input_handler;
 };

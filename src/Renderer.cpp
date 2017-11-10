@@ -76,6 +76,7 @@ void Renderer::beginFrame()
     device_context->RSSetViewports(1, &viewport);
 }
 
+
 void Renderer::endFrame()
 {
     swap_chain->Present(1, 0);
@@ -84,18 +85,31 @@ void Renderer::endFrame()
 
 bool Renderer::createDevice()
 {
-    DXGI_SWAP_CHAIN_DESC swap_chain_desc = { 0 };
-    swap_chain_desc.BufferCount = 1;
-    swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swap_chain_desc.OutputWindow = window->getHandle();
-    swap_chain_desc.SampleDesc.Count = 1;
-    swap_chain_desc.Windowed = true;
+    DXGI_MODE_DESC buffer_desc;
+    ZeroMemory(&buffer_desc, sizeof(DXGI_MODE_DESC));
 
-    auto hr = D3D11CreateDeviceAndSwapChain(
-        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0,
-        nullptr, 0, D3D11_SDK_VERSION, &swap_chain_desc,
-        &swap_chain, &d3d_device, nullptr, &device_context);
+    buffer_desc.Width = window->getWidth();
+    buffer_desc.Height = window->getHeight();
+    buffer_desc.RefreshRate.Numerator = 60;
+    buffer_desc.RefreshRate.Denominator = 1;
+    buffer_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    buffer_desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    buffer_desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+    DXGI_SWAP_CHAIN_DESC swap_chain_desc;
+    ZeroMemory(&swap_chain_desc, sizeof(DXGI_SWAP_CHAIN_DESC));
+
+    swap_chain_desc.BufferDesc = buffer_desc;
+    swap_chain_desc.SampleDesc.Count = 1;
+    swap_chain_desc.SampleDesc.Quality = 0;
+    swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    swap_chain_desc.BufferCount = 1;
+    swap_chain_desc.OutputWindow = window->getHandle();
+    swap_chain_desc.Windowed = true;
+    swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+    auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL,
+        D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain, &d3d_device, NULL, &device_context);
 
     if (hr != S_OK)
         return false;

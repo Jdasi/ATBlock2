@@ -97,5 +97,5 @@ const float Window::getHeightF() const
 
 const float Window::getAspectRatio() const
 {
-    return width / height;
+    return getWidthF() / getHeightF();
 }
