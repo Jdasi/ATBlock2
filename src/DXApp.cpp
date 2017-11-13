@@ -51,10 +51,12 @@ void DXApp::initObjects()
 
     auto cube = std::make_unique<Cube>(renderer.get());
     cube->setScale(5);
+    cube->setPos(0, 0, -1);
     game_objects.push_back(std::move(cube));
 
     auto triangle = std::make_unique<Triangle>(renderer.get());
     triangle->setRoll(50);
+    triangle->setPos(0, 0, 1);
     game_objects.push_back(std::move(triangle));
 
     // Game Data stuff.

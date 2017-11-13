@@ -10,7 +10,7 @@ Renderer::Renderer(Window* _window)
     , swap_chain(nullptr)
     , d3d_device(nullptr)
     , device_context(nullptr)
-    , viewport({ 0.f, 0.f, _window->getWidthF(), _window->getHeightF(), 0.0f, 1.0f })
+    , viewport({ 0.0f, 0.0f, _window->getWidthF(), _window->getHeightF(), 0.0f, 1.0f })
     , target_view(nullptr)
     , depth_stencil_buffer(nullptr)
     , depth_stencil_view(nullptr)
@@ -43,6 +43,9 @@ bool Renderer::init(const DirectX::XMFLOAT4& _clear_color)
         return false;
 
     setClearColor(_clear_color);
+
+    // Bind render target.
+    device_context->OMSetRenderTargets(1, &target_view, depth_stencil_view);
 
     return true;
 }
@@ -137,18 +140,14 @@ bool Renderer::createRenderTarget()
         return false;
     }
 
-    d3d_device->CreateRenderTargetView(back_buffer, nullptr, &target_view);
+    hr = d3d_device->CreateRenderTargetView(back_buffer, NULL, &target_view);
+    back_buffer->Release();
 
     if (FAILED(hr))
     {
         std::cout << "Failed to create Render Target View." << std::endl;
         return false;
     }
-
-    back_buffer->Release();
-
-    // Bind render target.
-    device_context->OMSetRenderTargets(1, &target_view, depth_stencil_view);
 
     return true;
 }
@@ -158,22 +157,22 @@ bool Renderer::createDepthStencil()
 {
     HRESULT hr;
 
-    D3D11_TEXTURE2D_DESC depthStencilDesc;
+    D3D11_TEXTURE2D_DESC depth_stencil_desc;
 
-    depthStencilDesc.Width = window->getWidth();
-    depthStencilDesc.Height = window->getHeight();
-    depthStencilDesc.MipLevels = 1;
-    depthStencilDesc.ArraySize = 1;
-    depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthStencilDesc.SampleDesc.Count = 1;
-    depthStencilDesc.SampleDesc.Quality = 0;
-    depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-    depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    depthStencilDesc.CPUAccessFlags = 0;
-    depthStencilDesc.MiscFlags = 0;
+    depth_stencil_desc.Width = window->getWidth();
+    depth_stencil_desc.Height = window->getHeight();
+    depth_stencil_desc.MipLevels = 1;
+    depth_stencil_desc.ArraySize = 1;
+    depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depth_stencil_desc.SampleDesc.Count = 1;
+    depth_stencil_desc.SampleDesc.Quality = 0;
+    depth_stencil_desc.Usage = D3D11_USAGE_DEFAULT;
+    depth_stencil_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depth_stencil_desc.CPUAccessFlags = 0;
+    depth_stencil_desc.MiscFlags = 0;
 
     // Create the Depth/Stencil View.
-    hr = d3d_device->CreateTexture2D(&depthStencilDesc, NULL, &depth_stencil_buffer);
+    hr = d3d_device->CreateTexture2D(&depth_stencil_desc, NULL, &depth_stencil_buffer);
     if (FAILED(hr))
     {
         std::cout << "Failed to create Depth Stencil Texture." << std::endl;

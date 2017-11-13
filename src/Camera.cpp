@@ -61,16 +61,23 @@ void Camera::handleInput(GameData* _gd)
 
     if (_gd->input_handler->getAction(GameAction::FORWARD))
     {
-        position.z += move_speed * JTime::getDeltaTime();
+        position.y += move_speed * JTime::getDeltaTime();
         mat_dirty = true;
-
-        std::cout << position.z << std::endl;
     }
     else if (_gd->input_handler->getAction(GameAction::BACKWARD))
     {
-        position.z -= move_speed * JTime::getDeltaTime();
+        position.y -= move_speed * JTime::getDeltaTime();
         mat_dirty = true;
-
-        std::cout << position.z << std::endl;
+    }
+    
+    if (_gd->input_handler->getAction(GameAction::LEFT))
+    {
+        position.x -= move_speed * JTime::getDeltaTime();
+        mat_dirty = true;
+    }
+    else if (_gd->input_handler->getAction(GameAction::RIGHT))
+    {
+        position.x += move_speed * JTime::getDeltaTime();
+        mat_dirty = true;
     }
 }
