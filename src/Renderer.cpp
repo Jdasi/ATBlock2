@@ -14,7 +14,8 @@ Renderer::Renderer(Window* _window)
     , target_view(nullptr)
     , depth_stencil_buffer(nullptr)
     , depth_stencil_view(nullptr)
-    , raster_state(nullptr)
+    , raster_state_solid(nullptr)
+    , raster_state_wire(nullptr)
 {
 }
 
@@ -27,7 +28,8 @@ Renderer::~Renderer()
     SAFE_RELEASE(target_view);
     SAFE_RELEASE(depth_stencil_buffer);
     SAFE_RELEASE(depth_stencil_view);
-    SAFE_RELEASE(raster_state);
+    SAFE_RELEASE(raster_state_solid);
+    SAFE_RELEASE(raster_state_wire);
 }
 
 
@@ -54,6 +56,23 @@ bool Renderer::init(const DirectX::XMFLOAT4& _clear_color)
 void Renderer::setClearColor(const DirectX::XMFLOAT4& _clear_color)
 {
     clear_color = _clear_color;
+}
+
+
+void Renderer::setRenderStyle(const RenderStyle& _render_style)
+{
+    switch (_render_style)
+    {
+        case SOLID:
+        {
+            device_context->RSSetState(raster_state_solid);
+        } break;
+
+        case WIREFRAME:
+        {
+            device_context->RSSetState(raster_state_wire);
+        } break;
+    }
 }
 
 
@@ -200,15 +219,26 @@ bool Renderer::createDepthStencil()
     raster_desc.ScissorEnable = false;
     raster_desc.SlopeScaledDepthBias = 0.0f;
 
-    // Create Raster State and use it.
-    hr = d3d_device->CreateRasterizerState(&raster_desc, &raster_state);
+    // Create Default Raster State.
+    hr = d3d_device->CreateRasterizerState(&raster_desc, &raster_state_solid);
     if (FAILED(hr))
     {
         std::cout << "Failed to create Rasteriser State." << std::endl;
         return false;
     }
 
-    device_context->RSSetState(raster_state);
+    raster_desc.FillMode = D3D11_FILL_WIREFRAME;
+
+    // Create Wireframe Raster State.
+    hr = d3d_device->CreateRasterizerState(&raster_desc, &raster_state_wire);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Rasteriser State." << std::endl;
+        return false;
+    }
+
+    // Set default raster state.
+    device_context->RSSetState(raster_state_solid);
 
     return true;
 }

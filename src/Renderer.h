@@ -8,11 +8,18 @@ class Window;
 class Renderer
 {
 public:
+    enum RenderStyle
+    {
+        SOLID,
+        WIREFRAME
+    };
+
     Renderer(Window* _window);
     ~Renderer();
 
     bool init(const DirectX::XMFLOAT4& _clear_color);
     void setClearColor(const DirectX::XMFLOAT4& _clear_color);
+    void setRenderStyle(const RenderStyle& _render_style);
 
     ID3D11Device* getDevice() const;
     ID3D11DeviceContext* getDeviceContext() const;
@@ -44,6 +51,7 @@ private:
     ID3D11DepthStencilView* depth_stencil_view;
 
     // Raster stuff.
-    ID3D11RasterizerState* raster_state;
+    ID3D11RasterizerState* raster_state_solid;
+    ID3D11RasterizerState* raster_state_wire;
 
 };
