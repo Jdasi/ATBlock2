@@ -11,14 +11,18 @@ public:
     virtual void tick(GameData* _gd);
     virtual void draw(DrawData* _dd);
 
+    bool isMatDirty() const;
+
     bool isVisible() const;
     void setVisible(const bool _visible);
 
-    const DirectX::XMMATRIX& getWorld() const;
+    const DirectX::XMMATRIX& getWorldMat() const;
+    const DirectX::XMMATRIX& getRotMat() const;
 
     const DirectX::XMFLOAT3& getPos() const;
     void setPos(const DirectX::XMFLOAT3& _pos);
     void setPos(const float _x, const float _y, const float _z);
+    void adjustPos(const float _x, const float _y, const float _z);
 
     const DirectX::XMFLOAT3& getScale() const;
     void setScale(const DirectX::XMFLOAT3& _scale);
@@ -36,10 +40,12 @@ public:
 
     void setYawPitchRoll(const float _yaw, const float _pitch, const float _roll);
 
-protected:
+private:
     bool visible;
 
     DirectX::XMMATRIX world_mat;
+    DirectX::XMMATRIX rot_mat;
+
     DirectX::XMFLOAT3 position;
     DirectX::XMFLOAT3 scale;
     

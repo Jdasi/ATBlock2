@@ -26,12 +26,20 @@ void Camera::tick(GameData* _gd)
 
     handleInput(_gd);
 
-    if (mat_dirty)
+    if (isMatDirty())
     {
-        proj_mat = DirectX::XMMatrixPerspectiveFovLH(field_of_view, aspect_ratio, near_plane, far_plane);
+        proj_mat = XMMatrixPerspectiveFovLH(field_of_view, aspect_ratio, near_plane, far_plane);
 
-        XMVECTOR eyev = XMLoadFloat3(&position);
-        XMVECTOR targetv = XMLoadFloat3(&target);
+        XMFLOAT3 current_target = target;
+
+        if (relative_look_at)
+        {
+            auto pos = getPos();
+            current_target = XMFLOAT3(pos.x + target.x, pos.y + target.y, pos.z + target.z);
+        }
+
+        XMVECTOR eyev = XMLoadFloat3(&getPos());
+        XMVECTOR targetv = XMLoadFloat3(&current_target);
         XMVECTOR upv = XMLoadFloat3(&up);
 
         view_mat = XMMatrixLookAtLH(eyev, targetv, upv);
@@ -39,6 +47,20 @@ void Camera::tick(GameData* _gd)
 
     // Base class will clear dirty status.
     GameObject::tick(_gd);
+}
+
+
+void Camera::setTarget(const DirectX::XMFLOAT3& _target)
+{
+    relative_look_at = false;
+    target = _target;
+}
+
+
+void Camera::setRelativeTarget(const DirectX::XMFLOAT3& _target)
+{
+    relative_look_at = true;
+    target = _target;
 }
 
 
@@ -57,27 +79,40 @@ const DirectX::XMMATRIX& Camera::getViewMat() const
 void Camera::handleInput(GameData* _gd)
 {
     float move_speed = 10;
-    float rot_speed = 10;
+    float scroll_speed = 1;
 
-    if (_gd->input_handler->getAction(GameAction::FORWARD))
+    if (_gd->input->getAction(GameAction::FORWARD))
     {
-        position.y += move_speed * JTime::getDeltaTime();
-        mat_dirty = true;
+        adjustPos(0, move_speed * JTime::getDeltaTime(), 0);
     }
-    else if (_gd->input_handler->getAction(GameAction::BACKWARD))
+    else if (_gd->input->getAction(GameAction::BACKWARD))
     {
-        position.y -= move_speed * JTime::getDeltaTime();
-        mat_dirty = true;
+        adjustPos(0, -(move_speed * JTime::getDeltaTime()), 0);
     }
     
-    if (_gd->input_handler->getAction(GameAction::LEFT))
+    if (_gd->input->getAction(GameAction::LEFT))
     {
-        position.x -= move_speed * JTime::getDeltaTime();
-        mat_dirty = true;
+        adjustPos(-(move_speed * JTime::getDeltaTime()), 0, 0);
     }
-    else if (_gd->input_handler->getAction(GameAction::RIGHT))
+    else if (_gd->input->getAction(GameAction::RIGHT))
     {
-        position.x += move_speed * JTime::getDeltaTime();
-        mat_dirty = true;
+        adjustPos(move_speed * JTime::getDeltaTime(), 0, 0);
+    }
+
+    if (_gd->input->getAction(GameAction::UP))
+    {
+        adjustPos(0, 0, move_speed * JTime::getDeltaTime());
+    }
+    else if (_gd->input->getAction(GameAction::DOWN))
+    {
+        adjustPos(0, 0, -(move_speed * JTime::getDeltaTime()));
+    }
+
+    adjustPos(0, 0, _gd->input->getMouseDeltaZ() * scroll_speed * JTime::getDeltaTime());
+
+    auto pos = getPos();
+    if (pos.z > -2)
+    {
+        setPos(pos.x, pos.y, -2);
     }
 }

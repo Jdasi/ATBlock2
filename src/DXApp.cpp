@@ -29,7 +29,7 @@ int DXApp::main()
 bool DXApp::init()
 {
     window = std::make_unique<Window>(hinstance);
-    if (!window->init("AT Block 2 Project", 800, 600))
+    if (!window->init("AT Block 2 Project", 1024, 768))
         return false;
 
     renderer = std::make_unique<Renderer>(window.get());
@@ -48,19 +48,13 @@ void DXApp::initObjects()
 {
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
     camera->setPos(0, 0, -10.0f);
+    camera->setRelativeTarget(DirectX::Vector3Forward);
 
     auto cube = std::make_unique<Cube>(renderer.get());
-    cube->setScale(5);
-    cube->setPos(0, 0, -1);
     game_objects.push_back(std::move(cube));
 
-    auto triangle = std::make_unique<Triangle>(renderer.get());
-    triangle->setRoll(50);
-    triangle->setPos(0, 0, 1);
-    game_objects.push_back(std::move(triangle));
-
     // Game Data stuff.
-    game_data.input_handler = input_handler.get();
+    game_data.input = input_handler.get();
 
     // Draw Data stuff.
     draw_data.renderer = renderer.get();
@@ -96,6 +90,9 @@ int DXApp::run()
             // Needs to be done last to properly record prev key states.
             input_handler->lateTick();
         }
+
+        // Clear message to avoid spam.
+        msg = { 0 };
     }
 
     return static_cast<int>(msg.wParam);

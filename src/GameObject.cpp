@@ -24,10 +24,10 @@ void GameObject::tick(GameData* _gd)
         mat_dirty = false;
 
         XMMATRIX scale_mat = XMMatrixScaling(scale.x, scale.y, scale.z);
-        XMMATRIX rotation_mat = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+        rot_mat = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
         XMMATRIX trans_mat = XMMatrixTranslation(position.x, position.y, position.z);
 
-        world_mat = scale_mat * rotation_mat * trans_mat;
+        world_mat = scale_mat * rot_mat * trans_mat;
     }
 }
 
@@ -35,6 +35,12 @@ void GameObject::tick(GameData* _gd)
 void GameObject::draw(DrawData* _dd)
 {
     // Base class draws nothing.
+}
+
+
+bool GameObject::isMatDirty() const
+{
+    return mat_dirty;
 }
 
 
@@ -50,9 +56,15 @@ void GameObject::setVisible(const bool _visible)
 }
 
 
-const DirectX::XMMATRIX& GameObject::getWorld() const
+const DirectX::XMMATRIX& GameObject::getWorldMat() const
 {
     return world_mat;
+}
+
+
+const DirectX::XMMATRIX& GameObject::getRotMat() const
+{
+    return rot_mat;
 }
 
 
@@ -72,6 +84,12 @@ void GameObject::setPos(const DirectX::XMFLOAT3& _pos)
 void GameObject::setPos(const float _x, const float _y, const float _z)
 {
     setPos(DirectX::XMFLOAT3(_x, _y, _z));
+}
+
+
+void GameObject::adjustPos(const float _x, const float _y, const float _z)
+{
+    setPos(DirectX::XMFLOAT3(position.x + _x, position.y + _y, position.z + _z));
 }
 
 

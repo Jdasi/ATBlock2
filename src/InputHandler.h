@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <vector>
 
+#include <DirectXMath.h>
+
 #include "GameAction.h"
 #include "Keybinding.h"
 
@@ -23,6 +25,10 @@ public:
     bool getActionDown(const GameAction& _action);
     bool getActionUp(const GameAction& _action);
 
+    int getMouseDeltaX() const;
+    int getMouseDeltaY() const;
+    int getMouseDeltaZ() const;
+
 private:
     void initKeyBindings();
     void sortKeyBindings();
@@ -31,6 +37,11 @@ private:
 
     bool keys[256];
     bool prev_keys[256];
+
+    POINT last_mouse_point;
+    int mouse_delta_x;
+    int mouse_delta_y;
+    int mouse_delta_z;
 
     std::vector<Keybinding> key_bindings;
 

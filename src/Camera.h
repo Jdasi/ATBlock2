@@ -12,6 +12,9 @@ public:
 
     virtual void tick(GameData* _gd) override;
 
+    void setTarget(const DirectX::XMFLOAT3& _target);
+    void setRelativeTarget(const DirectX::XMFLOAT3& _target);
+
     const DirectX::XMMATRIX& getProjMat() const;
     const DirectX::XMMATRIX& getViewMat() const;
 
@@ -28,5 +31,7 @@ protected:
 
     DirectX::XMFLOAT3 target;
     DirectX::XMFLOAT3 up;
+
+    bool relative_look_at;
 
 };

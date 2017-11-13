@@ -5,7 +5,14 @@
 
 
 InputHandler::InputHandler()
+    : last_mouse_point()
+    , mouse_delta_x(0)
+    , mouse_delta_y(0)
+    , mouse_delta_z(0)
 {
+    memset(&keys, false, sizeof(bool) * 256);
+    memset(&prev_keys, false, sizeof(bool) * 256);
+
     initKeyBindings();
 }
 
@@ -23,6 +30,21 @@ void InputHandler::processMessage(MSG _msg)
         {
             keys[_msg.wParam] = false;
         } break;
+
+        case WM_MOUSEMOVE:
+        {
+            POINT p = { LOWORD(_msg.lParam), HIWORD(_msg.lParam) };
+
+            mouse_delta_x = last_mouse_point.x - p.x;
+            mouse_delta_y = last_mouse_point.y - p.y;
+
+            last_mouse_point = p;
+        } break;
+
+        case WM_MOUSEWHEEL:
+        {
+            mouse_delta_z = GET_WHEEL_DELTA_WPARAM(_msg.wParam);
+        } break;
     }
 }
 
@@ -30,6 +52,7 @@ void InputHandler::processMessage(MSG _msg)
 void InputHandler::lateTick()
 {
     memcpy(prev_keys, keys, sizeof(bool) * 256);
+    mouse_delta_z = 0;
 }
 
 
@@ -69,6 +92,24 @@ bool InputHandler::getActionDown(const GameAction& _action)
 bool InputHandler::getActionUp(const GameAction& _action)
 {
     return getKeyUp(actionToKey(_action));
+}
+
+
+int InputHandler::getMouseDeltaX() const
+{
+    return mouse_delta_x;
+}
+
+
+int InputHandler::getMouseDeltaY() const
+{
+    return mouse_delta_y;
+}
+
+
+int InputHandler::getMouseDeltaZ() const
+{
+    return mouse_delta_z;
 }
 
 

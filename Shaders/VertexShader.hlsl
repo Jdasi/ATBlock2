@@ -1,6 +1,7 @@
 cbuffer ConstantBuffer
 {
     float4x4 wvp;
+    float4x4 rot;
 };
 
 struct Input

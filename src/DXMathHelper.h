@@ -10,6 +10,6 @@ namespace DirectX
     static const XMFLOAT3 Vector3Down      = {  0.f, -1.f,  0.f };
     static const XMFLOAT3 Vector3Right     = {  1.f,  0.f,  0.f };
     static const XMFLOAT3 Vector3Left      = { -1.f,  0.f,  0.f };
-    static const XMFLOAT3 Vector3Forward   = {  0.f,  0.f, -1.f };
-    static const XMFLOAT3 Vector3Backward  = {  0.f,  0.f,  1.f };
+    static const XMFLOAT3 Vector3Forward   = {  0.f,  0.f,  1.f };
+    static const XMFLOAT3 Vector3Backward  = {  0.f,  0.f, -1.f };
 }

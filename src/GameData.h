@@ -10,5 +10,5 @@ struct GameData
 
     bool exit;
 
-    InputHandler* input_handler;
+    InputHandler* input;
 };

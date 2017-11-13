@@ -5,6 +5,7 @@
 struct ConstantBuffer
 {
     DirectX::XMMATRIX wvp;
+    DirectX::XMMATRIX rot;
 };
 
 struct Vertex

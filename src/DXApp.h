@@ -6,7 +6,6 @@
 
 #include "Core.h"
 #include "Camera.h"
-#include "Triangle.h"
 #include "Cube.h"
 
 class DXApp

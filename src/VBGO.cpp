@@ -31,12 +31,6 @@ VBGO::~VBGO()
     SAFE_RELEASE(vertex_shader);
     SAFE_RELEASE(pixel_shader);
     SAFE_RELEASE(input_layout);
-
-    //if (cb_cpu)
-    //{
-    //    delete cb_cpu;
-    //    cb_cpu = nullptr;
-    //}
 }
 
 
@@ -64,8 +58,9 @@ void VBGO::draw(DrawData* _dd)
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     // Update constant buffer.
-    DirectX::XMMATRIX wvp = world_mat * _dd->camera->getViewMat() * _dd->camera->getProjMat();
+    DirectX::XMMATRIX wvp = getWorldMat() * _dd->camera->getViewMat() * _dd->camera->getProjMat();
     cb_cpu->wvp = DirectX::XMMatrixTranspose(wvp);
+    cb_cpu->rot = DirectX::XMMatrixTranspose(getRotMat());
 
     D3D11_MAPPED_SUBRESOURCE mapped_buffer;
     ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
