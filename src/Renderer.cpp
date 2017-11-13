@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Renderer.h"
 #include "Window.h"
 #include "DXUtil.h"
@@ -12,6 +14,7 @@ Renderer::Renderer(Window* _window)
     , target_view(nullptr)
     , depth_stencil_buffer(nullptr)
     , depth_stencil_view(nullptr)
+    , raster_state(nullptr)
 {
 }
 
@@ -24,6 +27,7 @@ Renderer::~Renderer()
     SAFE_RELEASE(target_view);
     SAFE_RELEASE(depth_stencil_buffer);
     SAFE_RELEASE(depth_stencil_view);
+    SAFE_RELEASE(raster_state);
 }
 
 
@@ -107,11 +111,14 @@ bool Renderer::createDevice()
     swap_chain_desc.Windowed = true;
     swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-    auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL,
+    auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, NULL, NULL,
         D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain, &d3d_device, NULL, &device_context);
 
-    if (hr != S_OK)
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Device and Swap Chain" << std::endl;
         return false;
+    }
 
     return true;
 }
@@ -125,12 +132,18 @@ bool Renderer::createRenderTarget()
     hr = swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&back_buffer);
 
     if (FAILED(hr))
-        return false; // Failed to get back buffer.
+    {
+        std::cout << "Failed to get Back Buffer" << std::endl;
+        return false;
+    }
 
     d3d_device->CreateRenderTargetView(back_buffer, nullptr, &target_view);
 
     if (FAILED(hr))
-        return false; // Failed to create render target view.
+    {
+        std::cout << "Failed to create Render Target View." << std::endl;
+        return false;
+    }
 
     back_buffer->Release();
 
@@ -143,7 +156,7 @@ bool Renderer::createRenderTarget()
 
 bool Renderer::createDepthStencil()
 {
-    HRESULT hr = {};
+    HRESULT hr;
 
     D3D11_TEXTURE2D_DESC depthStencilDesc;
 
@@ -159,9 +172,44 @@ bool Renderer::createDepthStencil()
     depthStencilDesc.CPUAccessFlags = 0;
     depthStencilDesc.MiscFlags = 0;
 
-    //Create the Depth/Stencil View
-    d3d_device->CreateTexture2D(&depthStencilDesc, NULL, &depth_stencil_buffer);
-    d3d_device->CreateDepthStencilView(depth_stencil_buffer, NULL, &depth_stencil_view);
+    // Create the Depth/Stencil View.
+    hr = d3d_device->CreateTexture2D(&depthStencilDesc, NULL, &depth_stencil_buffer);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Depth Stencil Texture." << std::endl;
+        return false;
+    }
+
+    hr = d3d_device->CreateDepthStencilView(depth_stencil_buffer, NULL, &depth_stencil_view);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Depth Stencil View." << std::endl;
+        return false;
+    }
+
+    // Set up Raster State.
+    D3D11_RASTERIZER_DESC raster_desc;
+
+    raster_desc.AntialiasedLineEnable = false;
+    raster_desc.CullMode = D3D11_CULL_BACK;
+    raster_desc.DepthBias = 0;
+    raster_desc.DepthBiasClamp = 0.0f;
+    raster_desc.DepthClipEnable = true;
+    raster_desc.FillMode = D3D11_FILL_SOLID;
+    raster_desc.FrontCounterClockwise = false;
+    raster_desc.MultisampleEnable = false;
+    raster_desc.ScissorEnable = false;
+    raster_desc.SlopeScaledDepthBias = 0.0f;
+
+    // Create Raster State and use it.
+    hr = d3d_device->CreateRasterizerState(&raster_desc, &raster_state);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Rasteriser State." << std::endl;
+        return false;
+    }
+
+    device_context->RSSetState(raster_state);
 
     return true;
 }

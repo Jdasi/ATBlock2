@@ -16,23 +16,7 @@ void Triangle::tick(GameData* _gd)
 
 void Triangle::draw(DrawData* _dd)
 {
-    auto device = _dd->renderer->getDevice();
-    auto context = _dd->renderer->getDeviceContext();
-
-    // Bind shaders.
-    context->IASetInputLayout(input_layout);
-    context->VSSetShader(vertex_shader, nullptr, 0);
-    context->PSSetShader(pixel_shader, nullptr, 0);
-
-    // Bind vertex buffer.
-    UINT stride = sizeof(Vertex); // How far to move in memory.
-    UINT offset = 0;
-    context->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
-    context->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    // Draw.
-    context->DrawIndexed(num_indices, 0, 0);
+    VBGO::draw(_dd);
 }
 
 

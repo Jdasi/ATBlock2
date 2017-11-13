@@ -43,4 +43,7 @@ private:
     ID3D11Texture2D* depth_stencil_buffer;
     ID3D11DepthStencilView* depth_stencil_view;
 
+    // Raster stuff.
+    ID3D11RasterizerState* raster_state;
+
 };

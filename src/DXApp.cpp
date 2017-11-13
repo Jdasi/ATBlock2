@@ -50,9 +50,11 @@ void DXApp::initObjects()
     camera->setPos(0, 0, -10.0f);
 
     auto cube = std::make_unique<Cube>(renderer.get());
+    cube->setScale(5);
     game_objects.push_back(std::move(cube));
 
     auto triangle = std::make_unique<Triangle>(renderer.get());
+    triangle->setRoll(50);
     game_objects.push_back(std::move(triangle));
 
     // Game Data stuff.

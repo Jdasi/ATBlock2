@@ -19,8 +19,7 @@ Output main(Input input)
 {
     Output output;
 
-    //output.position = mul(input.position, wvp);
-    output.position = input.position;
+    output.position = mul(input.position, wvp);
     output.color = input.color;
 
     return output;
