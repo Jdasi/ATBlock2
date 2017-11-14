@@ -6,15 +6,10 @@
 #include "Vertex.h"
 #include "VBModel.h"
 #include "ShaderData.h"
+#include "SwarmAgent.h"
 
 struct GameData;
 struct DrawData;
-
-struct InstanceData
-{
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT4 col;
-};
 
 class SwarmManager
 {
@@ -26,15 +21,18 @@ public:
     void draw(DrawData* _dd);
 
 private:
+    void createConstantBuffers(Renderer* _renderer);
+    void updateInstanceBuffer();
+
     Renderer* renderer;
 
-    std::vector<InstanceData> agents;
-
-    ID3D11Buffer* cb_perinst_buff;
+    ID3D11Buffer* cb_per_instance_buffer;
     ID3D11Buffer* agent_instance_buff;
+
     ID3D11Buffer* cb_gpu;
     CBPerObject* cb_cpu;
 
+    std::vector<SwarmAgent> agents;
     DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
 
     VBModel* agent_model;

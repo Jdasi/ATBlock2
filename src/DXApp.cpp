@@ -54,7 +54,7 @@ void DXApp::initObjects()
 {
     input_handler = std::make_unique<InputHandler>();
     vbmm = std::make_unique<VBModelManager>(renderer.get());
-    swarm_manager = std::make_unique<SwarmManager>(renderer.get(), vbmm->getModel("triangle"), 50000);
+    swarm_manager = std::make_unique<SwarmManager>(renderer.get(), vbmm->getModel("triangle"), 10000);
 
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
     camera->setPos(0, 0, -10.0f);

@@ -59,6 +59,9 @@
     <ClCompile Include="..\src\VBGO.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SwarmAgent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -123,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="..\src\VBGO.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SwarmAgent.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
