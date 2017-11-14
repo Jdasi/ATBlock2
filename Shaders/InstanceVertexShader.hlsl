@@ -6,8 +6,7 @@ cbuffer ConstantBuffer
 struct Input
 {
     float4 position : POSITION;
-    float3 instance_pos : INSTANCEPOS;
-    uint instance_id : SV_InstanceID;
+    float4 color : COLOR;
 };
 
 struct Output
@@ -20,10 +19,8 @@ Output main(Input input)
 {
     Output output;
 
-    input.position += float4(input.instance_pos, 0.0f);
-
     output.position = mul(input.position, transpose(wvp));
-    output.color = float4(1, 1, 1, 1);
+    output.color = input.color;
 
     return output;
 }

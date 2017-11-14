@@ -1,17 +1,28 @@
 #pragma once
 
+#include <vector>
+#include <memory>
+
 #include <d3d11.h>
 #include <DirectXMath.h>
+
+#include "ShaderData.h"
 
 class Window;
 
 class Renderer
 {
 public:
-    enum RenderStyle
+    enum RenderStyle : int
     {
         SOLID,
         WIREFRAME
+    };
+
+    enum ShaderType : int
+    {
+        DEFAULT,
+        INSTANCED
     };
 
     Renderer(Window* _window);
@@ -24,6 +35,8 @@ public:
     ID3D11Device* getDevice() const;
     ID3D11DeviceContext* getDeviceContext() const;
 
+    ShaderData* getShaderData(const ShaderType& _type);
+
     void beginFrame();
     void endFrame();
 
@@ -31,6 +44,7 @@ private:
     bool createDevice();
     bool createRenderTarget();
     bool createDepthStencil();
+    bool createShaders();
 
     Window* window;
     DirectX::XMFLOAT4 clear_color;
@@ -53,5 +67,8 @@ private:
     // Raster stuff.
     ID3D11RasterizerState* raster_state_solid;
     ID3D11RasterizerState* raster_state_wire;
+
+    // Shaders.
+    std::vector<std::unique_ptr<ShaderData>> shaders;
 
 };

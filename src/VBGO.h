@@ -1,40 +1,25 @@
 #pragma once
 
 #include "GameObject.h"
+#include "VBModel.h"
 
 class VBGO : public GameObject
 {
 public:
-    VBGO(Renderer* _renderer);
-    virtual ~VBGO();
+    VBGO(VBModel* _model);
+    virtual ~VBGO() = default;
 
     virtual void tick(GameData* _gd) override;
     virtual void draw(DrawData* _dd) override;
 
-protected:
-    virtual void createMesh(Renderer* _renderer);
-
-    void buildVB(Renderer* _renderer, const int _num_verts, Vertex* _vertices);
-    void buildIB(Renderer* _renderer, DWORD* _indices);
-
-    ID3D11Buffer* vertex_buffer;
-    ID3D11Buffer* index_buffer;
-
-    ID3D11Buffer* cb_gpu;
-    ConstantBuffer* cb_cpu;
-    ID3D11VertexShader* vertex_shader;
-    ID3D11PixelShader* pixel_shader;
-    ID3D11InputLayout* input_layout;
-
-    D3D_PRIMITIVE_TOPOLOGY topology;
-
-    UINT num_vertices;
-    UINT num_indices;
+    static void init(Renderer* _renderer);
+    static void cleanUp();
 
 private:
-    void init(Renderer* _renderer);
+    VBModel* model;
+    Renderer* renderer;
 
-    void createShaders(Renderer* _renderer);
-    void createConstantBuffers(Renderer* _renderer);
+    static ID3D11Buffer* s_cb_gpu;
+    static CBPerObject* s_cb_cpu;
 
 };

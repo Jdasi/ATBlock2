@@ -85,7 +85,8 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(0, move_speed * JTime::getDeltaTime(), 0);
     }
-    else if (_gd->input->getAction(GameAction::BACKWARD))
+    
+    if (_gd->input->getAction(GameAction::BACKWARD))
     {
         adjustPos(0, -(move_speed * JTime::getDeltaTime()), 0);
     }
@@ -94,7 +95,8 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(-(move_speed * JTime::getDeltaTime()), 0, 0);
     }
-    else if (_gd->input->getAction(GameAction::RIGHT))
+    
+    if (_gd->input->getAction(GameAction::RIGHT))
     {
         adjustPos(move_speed * JTime::getDeltaTime(), 0, 0);
     }
@@ -103,7 +105,8 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(0, 0, move_speed * JTime::getDeltaTime());
     }
-    else if (_gd->input->getAction(GameAction::DOWN))
+
+    if (_gd->input->getAction(GameAction::DOWN))
     {
         adjustPos(0, 0, -(move_speed * JTime::getDeltaTime()));
     }

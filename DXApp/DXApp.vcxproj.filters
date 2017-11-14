@@ -32,9 +32,6 @@
     <ClCompile Include="..\src\Window.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Triangle.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\InputHandler.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -44,9 +41,6 @@
     <ClCompile Include="..\src\SimpleTimer.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Cube.cpp">
-      <Filter>Assets</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Camera.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
@@ -55,6 +49,15 @@
     </ClCompile>
     <ClCompile Include="..\src\VBGO.cpp">
       <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SwarmManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBModel.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBModelManager.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +72,6 @@
     </ClInclude>
     <ClInclude Include="..\src\GameData.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Triangle.h">
-      <Filter>Assets</Filter>
     </ClInclude>
     <ClInclude Include="..\src\InputHandler.h">
       <Filter>Managers</Filter>
@@ -94,9 +94,6 @@
     <ClInclude Include="..\src\Vertex.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Cube.h">
-      <Filter>Assets</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Camera.h">
       <Filter>GameObject</Filter>
     </ClInclude>
@@ -114,6 +111,18 @@
     </ClInclude>
     <ClInclude Include="..\src\Core.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SwarmManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBModel.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBModelManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ShaderData.h">
+      <Filter>Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

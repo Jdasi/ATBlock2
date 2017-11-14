@@ -2,6 +2,7 @@
 
 #include "DXApp.h"
 #include "JTime.h"
+#include "VBGO.h"
 
 
 // Forward declaration of Window Procedure.
@@ -12,8 +13,13 @@ DXApp::DXApp(HINSTANCE _hinstance)
     : hinstance(_hinstance)
     , window(nullptr)
     , renderer(nullptr)
-    , input_handler(nullptr)
 {
+}
+
+
+DXApp::~DXApp()
+{
+    VBGO::cleanUp();
 }
 
 
@@ -36,7 +42,7 @@ bool DXApp::init()
     if (!renderer->init(DirectX::XMFLOAT4(0.2f, 0.2f, 0.6f, 1)))
         return false;
 
-    input_handler = std::make_unique<InputHandler>();
+    VBGO::init(renderer.get());
 
     initObjects();
 
@@ -46,12 +52,13 @@ bool DXApp::init()
 
 void DXApp::initObjects()
 {
+    input_handler = std::make_unique<InputHandler>();
+    vbmm = std::make_unique<VBModelManager>(renderer.get());
+    swarm_manager = std::make_unique<SwarmManager>(renderer.get(), vbmm->getModel("triangle"), 50000);
+
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
     camera->setPos(0, 0, -10.0f);
     camera->setRelativeTarget(DirectX::Vector3Forward);
-
-    auto cube = std::make_unique<Cube>(renderer.get());
-    game_objects.push_back(std::move(cube));
 
     // Game Data stuff.
     game_data.input = input_handler.get();
@@ -102,6 +109,7 @@ int DXApp::run()
 void DXApp::tick()
 {
     camera->tick(&game_data);
+    swarm_manager->tick(&game_data);
 
     for (auto& go : game_objects)
     {
@@ -123,6 +131,8 @@ void DXApp::render()
     {
         go->draw(&draw_data);
     }
+
+    swarm_manager->draw(&draw_data);
 
     renderer->endFrame();
 }

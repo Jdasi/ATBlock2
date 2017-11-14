@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 
 #include "Renderer.h"
@@ -44,6 +45,9 @@ bool Renderer::init(const DirectX::XMFLOAT4& _clear_color)
     if (!createDepthStencil())
         return false;
 
+    if (!createShaders())
+        return false;
+
     setClearColor(_clear_color);
 
     // Bind render target.
@@ -85,6 +89,12 @@ ID3D11Device* Renderer::getDevice() const
 ID3D11DeviceContext* Renderer::getDeviceContext() const
 {
     return device_context;
+}
+
+
+ShaderData* Renderer::getShaderData(const ShaderType& _type)
+{
+    return shaders[_type].get();
 }
 
 
@@ -239,6 +249,57 @@ bool Renderer::createDepthStencil()
 
     // Set default raster state.
     device_context->RSSetState(raster_state_solid);
+
+    return true;
+}
+
+
+bool Renderer::createShaders()
+{
+    HRESULT hr;
+    auto shader = std::make_unique<ShaderData>();
+
+    using namespace std;
+
+    // Create shaders.
+    ifstream vs_file("Resources/Shaders/VertexShader.cso", ios::binary);
+    ifstream ps_file("Resources/Shaders/PixelShader.cso", ios::binary);
+
+    vector<char> vs_data = { istreambuf_iterator<char>(vs_file), istreambuf_iterator<char>() };
+    vector<char> ps_data = { istreambuf_iterator<char>(ps_file), istreambuf_iterator<char>() };
+
+    hr = d3d_device->CreateVertexShader(vs_data.data(), vs_data.size(), NULL, &shader->vertex_shader);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Vertex Shader" << std::endl;
+        return false;
+    }
+
+    hr = d3d_device->CreatePixelShader(ps_data.data(), ps_data.size(), NULL, &shader->pixel_shader);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Pixel Shader" << std::endl;
+        return false;
+    }
+
+    // Create input layouts.
+    D3D11_INPUT_ELEMENT_DESC layout[] =
+    {
+        // Data from the Vertex Buffer.
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+        // Data from the Instance buffer.
+        { "INSTANCEPOS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+    };
+
+    hr = d3d_device->CreateInputLayout(layout, 2, vs_data.data(), vs_data.size(), &shader->input_layout);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Input Layout" << std::endl;
+        return false;
+    }
+
+    shaders.push_back(std::move(shader));
 
     return true;
 }

@@ -20,22 +20,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
-    <ClCompile Include="..\src\Cube.cpp" />
     <ClCompile Include="..\src\DXApp.cpp" />
     <ClCompile Include="..\src\GameObject.cpp" />
     <ClCompile Include="..\src\InputHandler.cpp" />
     <ClCompile Include="..\src\JTime.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\SimpleTimer.cpp" />
-    <ClCompile Include="..\src\Triangle.cpp" />
+    <ClCompile Include="..\src\SwarmManager.cpp" />
     <ClCompile Include="..\src\VBGO.cpp" />
+    <ClCompile Include="..\src\VBModel.cpp" />
+    <ClCompile Include="..\src\VBModelManager.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
     <ClCompile Include="..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\Core.h" />
-    <ClInclude Include="..\src\Cube.h" />
     <ClInclude Include="..\src\DrawData.h" />
     <ClInclude Include="..\src\DXApp.h" />
     <ClInclude Include="..\src\DXMathHelper.h" />
@@ -47,9 +47,12 @@
     <ClInclude Include="..\src\JTime.h" />
     <ClInclude Include="..\src\Keybinding.h" />
     <ClInclude Include="..\src\Renderer.h" />
+    <ClInclude Include="..\src\ShaderData.h" />
     <ClInclude Include="..\src\SimpleTimer.h" />
-    <ClInclude Include="..\src\Triangle.h" />
+    <ClInclude Include="..\src\SwarmManager.h" />
     <ClInclude Include="..\src\VBGO.h" />
+    <ClInclude Include="..\src\VBModel.h" />
+    <ClInclude Include="..\src\VBModelManager.h" />
     <ClInclude Include="..\src\Vertex.h" />
     <ClInclude Include="..\src\Window.h" />
   </ItemGroup>

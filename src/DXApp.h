@@ -6,13 +6,12 @@
 
 #include "Core.h"
 #include "Camera.h"
-#include "Cube.h"
 
 class DXApp
 {
 public:
     DXApp(HINSTANCE _hinstance);
-    ~DXApp() = default;
+    ~DXApp();
 
     int main();
 
@@ -31,6 +30,8 @@ private:
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<InputHandler> input_handler;
+    std::unique_ptr<VBModelManager> vbmm;
+    std::unique_ptr<SwarmManager> swarm_manager;
 
     // Data.
     GameData game_data;

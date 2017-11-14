@@ -1,11 +1,17 @@
 #pragma once
 
+#include <vector>
+
 #include <DirectXMath.h>
 
-struct ConstantBuffer
+struct CBPerObject
 {
-    DirectX::XMMATRIX wvp;
-    DirectX::XMMATRIX rot;
+    DirectX::XMMATRIX wvp = DirectX::XMMatrixIdentity();
+};
+
+struct CBPerFrame
+{
+    std::vector<DirectX::XMMATRIX> agent_mats;
 };
 
 struct Vertex
