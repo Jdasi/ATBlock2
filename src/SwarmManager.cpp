@@ -40,9 +40,12 @@ SwarmManager::SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int
     {
         float rand_x = ((float)(rand() % 2000) / 10) - 100;
         float rand_y = ((float)(rand() % 2000) / 10) - 100;
-        temp = DirectX::XMVectorSet(rand_x, rand_y, 0, 0.0f);
-
+        temp = DirectX::XMVectorSet(rand_x, rand_y, 0, 1);
         DirectX::XMStoreFloat3(&agents[i].pos, temp);
+
+        float rand_z = ((float)(rand() % 2000) / 10) - 100;
+        temp = DirectX::XMVectorSet(rand_x, rand_y, rand_z, 1);
+        DirectX::XMStoreFloat4(&agents[i].col, temp);
     }
 
     D3D11_BUFFER_DESC instBuffDesc;

@@ -13,6 +13,7 @@ struct DrawData;
 struct InstanceData
 {
     DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 col;
 };
 
 class SwarmManager

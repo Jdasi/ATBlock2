@@ -47,9 +47,6 @@
     <ClCompile Include="..\src\GameObject.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\VBGO.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SwarmManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
@@ -58,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="..\src\VBModelManager.cpp">
       <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBGO.cpp">
+      <Filter>GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +106,6 @@
     <ClInclude Include="..\src\DXMathHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VBGO.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Core.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -123,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="..\src\ShaderData.h">
       <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBGO.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

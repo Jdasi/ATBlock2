@@ -290,9 +290,11 @@ bool Renderer::createShaders()
 
         // Data from the Instance buffer.
         { "INSTANCEPOS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+        { "INSTANCECOLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
     };
+    UINT num_elems = ARRAYSIZE(layout);
 
-    hr = d3d_device->CreateInputLayout(layout, 2, vs_data.data(), vs_data.size(), &shader->input_layout);
+    hr = d3d_device->CreateInputLayout(layout, num_elems, vs_data.data(), vs_data.size(), &shader->input_layout);
     if (FAILED(hr))
     {
         std::cout << "Failed to create Input Layout" << std::endl;
