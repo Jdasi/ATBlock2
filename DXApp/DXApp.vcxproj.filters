@@ -56,10 +56,10 @@
     <ClCompile Include="..\src\VBModelManager.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\VBGO.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SwarmAgent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NavNode.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -124,10 +124,10 @@
     <ClInclude Include="..\src\ShaderData.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VBGO.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SwarmAgent.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NavNode.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -78,9 +78,12 @@ const DirectX::XMMATRIX& Camera::getViewMat() const
 
 void Camera::handleInput(GameData* _gd)
 {
-    float move_speed = 10;
-    float scroll_speed = 1;
+    auto pos = getPos();
+    float modifier = abs(pos.z);
 
+    float move_speed = 0.5f * modifier;
+    float scroll_speed = 1;
+    
     if (_gd->input->getAction(GameAction::FORWARD))
     {
         adjustPos(0, move_speed * JTime::getDeltaTime(), 0);
@@ -111,11 +114,21 @@ void Camera::handleInput(GameData* _gd)
         adjustPos(0, 0, -(move_speed * JTime::getDeltaTime()));
     }
 
-    adjustPos(0, 0, _gd->input->getMouseDeltaZ() * scroll_speed * JTime::getDeltaTime());
+    int scroll = _gd->input->getMouseDeltaZ();
+    if (scroll != 0)
+    {
+        adjustPos(0, 0, scroll * scroll_speed * JTime::getDeltaTime());
+    }
 
-    auto pos = getPos();
+    if (isMatDirty())
+    {
+        //std::cout << "Camera Position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+    }
+
+    pos = getPos();
     if (pos.z > -2)
     {
         setPos(pos.x, pos.y, -2);
     }
+
 }

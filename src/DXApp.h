@@ -39,6 +39,5 @@ private:
 
     // Objects.
     std::unique_ptr<Camera> camera;
-    std::vector<std::unique_ptr<GameObject>> game_objects;
 
 };

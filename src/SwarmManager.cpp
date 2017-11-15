@@ -10,24 +10,31 @@ SwarmManager::SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int
     : renderer(_renderer)
     , agent_model(_agent_model)
     , num_agents(_num_agents)
+    , grid_size_x(1)
+    , grid_size_y(1)
+    , grid_scale(10)
 {
     agents.assign(_num_agents, SwarmAgent());
     for (int i = 0; i < _num_agents; ++i)
     {
-        /*
         float rand_x = ((float)(rand() % 2000) / 10) - 100;
         float rand_y = ((float)(rand() % 2000) / 10) - 100;
+
         agents[i].setPos(rand_x, rand_y, 0);
-
-        float rand_z = ((float)(rand() % 2000) / 10) - 100;
-        agents[i].setColor(rand_x, rand_y, rand_z, 1);
-        */
-
         agents[i].setColor(1, 0, 0, 1);
     }
 
     createConstantBuffers(_renderer);
-    configureInstanceBuffer();
+    createScene(_renderer);
+    configureAgentInstanceBuffer();
+}
+
+
+SwarmManager::~SwarmManager()
+{
+    SAFE_RELEASE(cb_gpu);
+    SAFE_RELEASE(agent_inst_buff);
+    SAFE_RELEASE(scene_inst_buff);
 }
 
 
@@ -44,15 +51,17 @@ void SwarmManager::tick(GameData* _gd)
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
     agents[0].setPos(DirectX::XMFLOAT3(cam_pos.x, cam_pos.y, 0));
 
+    nav_nodes[0].containsPoint(agents[0].getPos());
+
     // Update the instance buffer after behaviour tick ..
-    updateInstanceBuffer();
+    updateAgentInstanceBuffer();
 }
 
 
 void SwarmManager::draw(DrawData* _dd)
 {
-    auto device = _dd->renderer->getDevice();
-    auto context = _dd->renderer->getDeviceContext();
+    auto* device = _dd->renderer->getDevice();
+    auto* context = _dd->renderer->getDeviceContext();
 
     // Bind shaders.
     auto shader = agent_model->getShader();
@@ -61,33 +70,13 @@ void SwarmManager::draw(DrawData* _dd)
     context->VSSetShader(shader->vertex_shader, nullptr, 0);
     context->PSSetShader(shader->pixel_shader, nullptr, 0);
 
-    // CONSTANT BUFFER STUFF --------------------------------------------------------------------
-    // Update constant buffer.
-    cb_cpu->obj_world = DirectX::XMMatrixTranspose(agent_world);
+    // START CONSTANT BUFFER STUFF ---------------------------------------------
     cb_cpu->view = DirectX::XMMatrixTranspose(_dd->camera->getViewMat());
     cb_cpu->proj = DirectX::XMMatrixTranspose(_dd->camera->getProjMat());
+    // END CONSTANT BUFFER STUFF -----------------------------------------------
 
-    D3D11_MAPPED_SUBRESOURCE mapped_buffer;
-    ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-    HRESULT hr = context->Map(cb_gpu, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
-    memcpy(mapped_buffer.pData, cb_cpu, sizeof(CBPerObject));
-    context->Unmap(cb_gpu, 0);
-
-    context->VSSetConstantBuffers(0, 1, &cb_gpu);
-    // END CONSTANT BUFFER STUFF ---------------------------------------------------------------
-
-    // Bind vertex buffer.
-    UINT strides[2] = { sizeof(Vertex), sizeof(SwarmAgent) };
-    UINT offsets[2] = { 0, 0 };
-
-    ID3D11Buffer* vert_inst_buffers[2] = { *agent_model->getVertexBuffer(), agent_instance_buff };
-
-    context->IASetVertexBuffers(0, 2, vert_inst_buffers, strides, offsets);
-    context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-    context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    context->DrawIndexedInstanced(agent_model->getNumIndices(), num_agents, 0, 0, 0);
+    drawAgents(device, context);
+    drawScene(device, context);
 }
 
 
@@ -117,25 +106,114 @@ void SwarmManager::createConstantBuffers(Renderer* _renderer)
 }
 
 
-void SwarmManager::configureInstanceBuffer()
+void SwarmManager::createScene(Renderer* _renderer)
 {
-    ZeroMemory(&instance_buffer_desc, sizeof(instance_buffer_desc));
-    instance_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
-    instance_buffer_desc.ByteWidth = sizeof(SwarmAgent) * num_agents;
-    instance_buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    instance_buffer_desc.CPUAccessFlags = 0;
-    instance_buffer_desc.MiscFlags = 0;
+    int grid_size = grid_size_x * grid_size_y;
 
-    ZeroMemory(&inst_resource_data, sizeof(inst_resource_data));
-    inst_resource_data.pSysMem = &agents[0];
+    nav_nodes.assign(grid_size, NavNode(grid_scale));
+
+    D3D11_BUFFER_DESC scene_inst_buff_desc;
+    ZeroMemory(&scene_inst_buff_desc, sizeof(scene_inst_buff_desc));
+    scene_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
+    scene_inst_buff_desc.ByteWidth = sizeof(NavNode) * grid_size;
+    scene_inst_buff_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    scene_inst_buff_desc.CPUAccessFlags = 0;
+    scene_inst_buff_desc.MiscFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA scene_inst_res_data;
+    ZeroMemory(&scene_inst_res_data, sizeof(scene_inst_res_data));
+    scene_inst_res_data.pSysMem = &nav_nodes[0];
+
+    for (int row = 0; row < grid_size_y; ++row)
+    {
+        for (int col = 0; col < grid_size_x; ++col)
+        {
+            auto& node = nav_nodes[(row * grid_size_x) + col];
+            node.setPos(col, row, 0);
+            node.setColor(1, 1, 1, 1);
+        }
+    }
+
+    HRESULT hr = renderer->getDevice()->CreateBuffer(&scene_inst_buff_desc,
+        &scene_inst_res_data, &scene_inst_buff);
+
+    DirectX::XMMATRIX scale_mat = DirectX::XMMatrixScaling(grid_scale, grid_scale, 1);
+    nav_world = nav_world * scale_mat;
 }
 
 
-void SwarmManager::updateInstanceBuffer()
+void SwarmManager::configureAgentInstanceBuffer()
+{
+    ZeroMemory(&agent_inst_buff_desc, sizeof(agent_inst_buff_desc));
+    agent_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
+    agent_inst_buff_desc.ByteWidth = sizeof(SwarmAgent) * num_agents;
+    agent_inst_buff_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    agent_inst_buff_desc.CPUAccessFlags = 0;
+    agent_inst_buff_desc.MiscFlags = 0;
+
+    ZeroMemory(&agent_inst_res_data, sizeof(agent_inst_res_data));
+    agent_inst_res_data.pSysMem = &agents[0];
+}
+
+
+void SwarmManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
+{
+    // Update current world.
+    cb_cpu->obj_world = DirectX::XMMatrixTranspose(agent_world);
+    updateConstantBuffer(_device, _context);
+
+    // Bind vertex buffer.
+    UINT strides[2] = { sizeof(Vertex), sizeof(SwarmAgent) };
+    UINT offsets[2] = { 0, 0 };
+
+    ID3D11Buffer* vert_inst_buffers[2] = { *agent_model->getVertexBuffer(), agent_inst_buff };
+
+    _context->IASetVertexBuffers(0, 2, vert_inst_buffers, strides, offsets);
+    _context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+    _context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    _context->DrawIndexedInstanced(agent_model->getNumIndices(), num_agents, 0, 0, 0);
+}
+
+
+void SwarmManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context)
+{
+    // Update current world.
+    cb_cpu->obj_world = DirectX::XMMatrixTranspose(nav_world);
+    updateConstantBuffer(_device, _context);
+
+    // Bind vertex buffer.
+    UINT strides[2] = { sizeof(Vertex), sizeof(NavNode) };
+    UINT offsets[2] = { 0, 0 };
+
+    ID3D11Buffer* vert_inst_buffers[2] = { *agent_model->getVertexBuffer(), scene_inst_buff };
+
+    _context->IASetVertexBuffers(0, 2, vert_inst_buffers, strides, offsets);
+    _context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+    _context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    _context->DrawIndexedInstanced(agent_model->getNumIndices(), grid_size_x * grid_size_y, 0, 0, 0);
+}
+
+
+void SwarmManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
+{
+    D3D11_MAPPED_SUBRESOURCE mapped_buffer;
+    ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+    HRESULT hr = _context->Map(cb_gpu, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
+    memcpy(mapped_buffer.pData, cb_cpu, sizeof(CBPerObject));
+    _context->Unmap(cb_gpu, 0);
+
+    _context->VSSetConstantBuffers(0, 1, &cb_gpu);
+}
+
+
+void SwarmManager::updateAgentInstanceBuffer()
 {
     HRESULT hr = { 0 };
 
-    SAFE_RELEASE(agent_instance_buff);
-    hr = renderer->getDevice()->CreateBuffer(&instance_buffer_desc,
-        &inst_resource_data, &agent_instance_buff);
+    SAFE_RELEASE(agent_inst_buff);
+    hr = renderer->getDevice()->CreateBuffer(&agent_inst_buff_desc,
+        &agent_inst_res_data, &agent_inst_buff);
 }
