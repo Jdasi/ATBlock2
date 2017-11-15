@@ -13,9 +13,11 @@ public:
     void setPos(const float _x, const float _y, const float _z);
     void adjustPos(const float _x, const float _y, const float _z);
 
-    const DirectX::XMFLOAT4& getCol() const;
-    void setColor(const DirectX::XMFLOAT4& _color);
-    void setColor(const float _r, const float _g, const float _b, const float _a);
+    int getNodeIndex() const;
+    void setNodeIndex(const int _node_index);
+
+    bool isWalkable() const;
+    void setWalkable(const bool _walkable);
 
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
 
@@ -23,6 +25,8 @@ private:
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT4 color;
 
+    int node_index;
     float matrix_scale;
+    bool walkable;
 
 };

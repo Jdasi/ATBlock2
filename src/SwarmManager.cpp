@@ -10,8 +10,8 @@ SwarmManager::SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int
     : renderer(_renderer)
     , agent_model(_agent_model)
     , num_agents(_num_agents)
-    , grid_size_x(1)
-    , grid_size_y(1)
+    , grid_size_x(25)
+    , grid_size_y(25)
     , grid_scale(10)
 {
     agents.assign(_num_agents, SwarmAgent());
@@ -51,7 +51,10 @@ void SwarmManager::tick(GameData* _gd)
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
     agents[0].setPos(DirectX::XMFLOAT3(cam_pos.x, cam_pos.y, 0));
 
-    nav_nodes[0].containsPoint(agents[0].getPos());
+    for (NavNode& node : nav_nodes)
+    {
+        node.containsPoint(agents[0].getPos());
+    }
 
     // Update the instance buffer after behaviour tick ..
     updateAgentInstanceBuffer();
@@ -128,9 +131,12 @@ void SwarmManager::createScene(Renderer* _renderer)
     {
         for (int col = 0; col < grid_size_x; ++col)
         {
-            auto& node = nav_nodes[(row * grid_size_x) + col];
+            int index = (row * grid_size_x) + col;
+            auto& node = nav_nodes[index];
+
+            node.setNodeIndex(index);
             node.setPos(col, row, 0);
-            node.setColor(1, 1, 1, 1);
+            node.setWalkable(true);
         }
     }
 

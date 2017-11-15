@@ -5,9 +5,10 @@
 
 NavNode::NavNode(const float _matrix_scale)
     : pos(0, 0, 0)
-    , color(1, 1, 1, 1)
+    , node_index(0)
     , matrix_scale(_matrix_scale)
 {
+    setWalkable(true);
 }
 
 
@@ -37,21 +38,30 @@ void NavNode::adjustPos(const float _x, const float _y, const float _z)
 }
 
 
-const DirectX::XMFLOAT4& NavNode::getCol() const
+int NavNode::getNodeIndex() const
 {
-    return color;
+    return node_index;
 }
 
 
-void NavNode::setColor(const DirectX::XMFLOAT4& _color)
+void NavNode::setNodeIndex(const int _node_index)
 {
-    color = _color;
+    node_index = _node_index;
 }
 
 
-void NavNode::setColor(const float _r, const float _g, const float _b, const float _a)
+bool NavNode::isWalkable() const
 {
-    setColor(DirectX::XMFLOAT4(_r, _g, _b, _a));
+    return walkable;
+}
+
+
+void NavNode::setWalkable(const bool _walkable)
+{
+    float val = _walkable ? 1.0f : 0.0f;
+    walkable = _walkable;
+
+    color = DirectX::XMFLOAT4(val, val, val, 1);
 }
 
 
@@ -59,15 +69,19 @@ bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
 {
     float half_scale = matrix_scale / 2;
 
-    if ((pos.x - half_scale) + matrix_scale >= _pos.x &&
-        (pos.x - half_scale) <= _pos.x &&
-        (pos.y - half_scale) + matrix_scale >= _pos.y &&
-        (pos.y - half_scale) <= _pos.y)
+    float left = (pos.x * matrix_scale) - half_scale;
+    float right = left + matrix_scale;
+    float bottom = (pos.y * matrix_scale) - half_scale;
+    float top = bottom + matrix_scale;
+
+    if (right >= _pos.x &&
+        left <= _pos.x &&
+        top >= _pos.y &&
+        bottom <= _pos.y)
     {
-        std::cout << "contains point" << std::endl;
+        std::cout << "Node: " << node_index << " contains point" << std::endl;
         return true;
     }
 
-    std::cout << "doesnt contain point" << std::endl;
     return false;
 }
