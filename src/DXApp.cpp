@@ -54,7 +54,7 @@ void DXApp::initObjects()
 {
     input_handler = std::make_unique<InputHandler>();
     vbmm = std::make_unique<VBModelManager>(renderer.get());
-    swarm_manager = std::make_unique<SwarmManager>(renderer.get(), vbmm->getModel("triangle"), 10000);
+    swarm_manager = std::make_unique<SwarmManager>(renderer.get(), vbmm->getModel("triangle"), 2);
 
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
     camera->setPos(0, 0, -10.0f);
@@ -110,6 +110,8 @@ void DXApp::tick()
 {
     camera->tick(&game_data);
     swarm_manager->tick(&game_data);
+
+    game_data.camera_pos = camera->getPos();
 
     for (auto& go : game_objects)
     {

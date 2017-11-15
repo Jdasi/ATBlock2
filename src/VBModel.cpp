@@ -92,15 +92,17 @@ void VBModel::createMesh(Renderer* _renderer)
 
     Vertex vertices[] =
     {
-        Vertex( 0.0f,  0.5f, 0),
-        Vertex( 0.5f, -0.5f, 0),
         Vertex(-0.5f, -0.5f, 0),
+        Vertex(-0.5f,  0.5f, 0),
+        Vertex( 0.5f,  0.5f, 0),
+        Vertex( 0.5f, -0.5f, 0),
     };
     num_vertices = ARRAYSIZE(vertices);
 
     DWORD indices[] =
     {
         0, 1, 2,
+        0, 2, 3
     };
     num_indices = ARRAYSIZE(indices);
 

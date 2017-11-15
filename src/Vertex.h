@@ -6,12 +6,16 @@
 
 struct CBPerObject
 {
-    DirectX::XMMATRIX wvp = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX obj_world = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX obj_rot = DirectX::XMMatrixIdentity();
+
+    DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
 };
 
 struct CBPerFrame
 {
-    std::vector<DirectX::XMMATRIX> agent_mats;
+    DirectX::XMMATRIX node_mats;
 };
 
 struct Vertex

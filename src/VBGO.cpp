@@ -28,7 +28,7 @@ void VBGO::draw(DrawData* _dd)
     auto context = _dd->renderer->getDeviceContext();
 
     // Update constant buffer.
-    s_cb_cpu->wvp = getWorldMat() * _dd->camera->getViewMat() * _dd->camera->getProjMat();
+    //s_cb_cpu->wvp = getWorldMat() * _dd->camera->getViewMat() * _dd->camera->getProjMat();
 
     D3D11_MAPPED_SUBRESOURCE mapped_buffer;
     ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));

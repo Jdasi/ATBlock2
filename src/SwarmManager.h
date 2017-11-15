@@ -22,6 +22,7 @@ public:
 
 private:
     void createConstantBuffers(Renderer* _renderer);
+    void configureInstanceBuffer();
     void updateInstanceBuffer();
 
     Renderer* renderer;
@@ -31,6 +32,9 @@ private:
 
     ID3D11Buffer* cb_gpu;
     CBPerObject* cb_cpu;
+
+    D3D11_BUFFER_DESC instance_buffer_desc;
+    D3D11_SUBRESOURCE_DATA inst_resource_data;
 
     std::vector<SwarmAgent> agents;
     DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
