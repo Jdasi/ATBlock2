@@ -51,10 +51,19 @@ void SwarmManager::tick(GameData* _gd)
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
     agents[0].setPos(DirectX::XMFLOAT3(cam_pos.x, cam_pos.y, 0));
 
-    for (NavNode& node : nav_nodes)
-    {
-        node.containsPoint(agents[0].getPos());
-    }
+    // Calculate what tile the agent is sat in...
+    auto& pos = agents[0].getPos();
+    float half_scale = grid_scale * 0.5f;
+
+    auto offsetx = pos.x + (grid_scale * 0.5f);
+    int ix = static_cast<int>(offsetx) / grid_scale;
+
+    auto offsety = pos.y + (grid_scale * 0.5f);
+    int iy = static_cast<int>(offsety) / grid_scale;
+
+    int index = (iy * grid_size_x) + ix;
+
+    std::cout << "Agent is in tile: " << index << std::endl;
 
     // Update the instance buffer after behaviour tick ..
     updateAgentInstanceBuffer();
@@ -78,7 +87,10 @@ void SwarmManager::draw(DrawData* _dd)
     cb_cpu->proj = DirectX::XMMatrixTranspose(_dd->camera->getProjMat());
     // END CONSTANT BUFFER STUFF -----------------------------------------------
 
+    _dd->renderer->setRenderStyle(Renderer::RenderStyle::SOLID);
     drawAgents(device, context);
+
+    _dd->renderer->setRenderStyle(Renderer::RenderStyle::WIREFRAME);
     drawScene(device, context);
 }
 

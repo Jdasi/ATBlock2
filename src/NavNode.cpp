@@ -79,7 +79,6 @@ bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
         top >= _pos.y &&
         bottom <= _pos.y)
     {
-        std::cout << "Node: " << node_index << " contains point" << std::endl;
         return true;
     }
 

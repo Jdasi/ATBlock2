@@ -57,6 +57,6 @@ private:
 
     int grid_size_x;
     int grid_size_y;
-    float grid_scale;
+    int grid_scale;
 
 };
