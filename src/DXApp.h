@@ -31,7 +31,7 @@ private:
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<InputHandler> input_handler;
     std::unique_ptr<VBModelManager> vbmm;
-    std::unique_ptr<SwarmManager> swarm_manager;
+    std::unique_ptr<SimulationManager> swarm_manager;
 
     // Data.
     GameData game_data;

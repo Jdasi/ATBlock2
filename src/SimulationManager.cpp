@@ -1,17 +1,16 @@
 #include <iostream>
 
-#include "SwarmManager.h"
+#include "SimulationManager.h"
 #include "DrawData.h"
 #include "Camera.h"
 #include "JTime.h"
+#include "FileIO.h"
 
 
-SwarmManager::SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents)
+SimulationManager::SimulationManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents)
     : renderer(_renderer)
     , agent_model(_agent_model)
     , num_agents(_num_agents)
-    , grid_size_x(25)
-    , grid_size_y(25)
     , grid_scale(10)
 {
     agents.assign(_num_agents, SwarmAgent());
@@ -30,7 +29,7 @@ SwarmManager::SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int
 }
 
 
-SwarmManager::~SwarmManager()
+SimulationManager::~SimulationManager()
 {
     SAFE_RELEASE(cb_gpu);
     SAFE_RELEASE(agent_inst_buff);
@@ -38,7 +37,7 @@ SwarmManager::~SwarmManager()
 }
 
 
-void SwarmManager::tick(GameData* _gd)
+void SimulationManager::tick(GameData* _gd)
 {
     /*
     // Perform all swarm behaviour ..
@@ -61,7 +60,7 @@ void SwarmManager::tick(GameData* _gd)
     auto offsety = pos.y + (grid_scale * 0.5f);
     int iy = static_cast<int>(offsety) / grid_scale;
 
-    int index = (iy * grid_size_x) + ix;
+    int index = (iy * level->width) + ix;
 
     std::cout << "Agent is in tile: " << index << std::endl;
 
@@ -70,7 +69,7 @@ void SwarmManager::tick(GameData* _gd)
 }
 
 
-void SwarmManager::draw(DrawData* _dd)
+void SimulationManager::draw(DrawData* _dd)
 {
     auto* device = _dd->renderer->getDevice();
     auto* context = _dd->renderer->getDeviceContext();
@@ -95,7 +94,7 @@ void SwarmManager::draw(DrawData* _dd)
 }
 
 
-void SwarmManager::createConstantBuffers(Renderer* _renderer)
+void SimulationManager::createConstantBuffers(Renderer* _renderer)
 {
     auto device = _renderer->getDevice();
 
@@ -121,9 +120,11 @@ void SwarmManager::createConstantBuffers(Renderer* _renderer)
 }
 
 
-void SwarmManager::createScene(Renderer* _renderer)
+void SimulationManager::createScene(Renderer* _renderer)
 {
-    int grid_size = grid_size_x * grid_size_y;
+    level = std::make_unique<Level>(FileIO::loadLevel("level1.txt"));
+
+    int grid_size = level->width * level->height;
 
     nav_nodes.assign(grid_size, NavNode(grid_scale));
 
@@ -139,16 +140,16 @@ void SwarmManager::createScene(Renderer* _renderer)
     ZeroMemory(&scene_inst_res_data, sizeof(scene_inst_res_data));
     scene_inst_res_data.pSysMem = &nav_nodes[0];
 
-    for (int row = 0; row < grid_size_y; ++row)
+    for (int row = 0; row < level->height; ++row)
     {
-        for (int col = 0; col < grid_size_x; ++col)
+        for (int col = 0; col < level->width; ++col)
         {
-            int index = (row * grid_size_x) + col;
+            int index = (row * level->width) + col;
             auto& node = nav_nodes[index];
 
             node.setNodeIndex(index);
             node.setPos(col, row, 0);
-            node.setWalkable(true);
+            node.setWalkable(level->data[index] != 'W');
         }
     }
 
@@ -160,7 +161,7 @@ void SwarmManager::createScene(Renderer* _renderer)
 }
 
 
-void SwarmManager::configureAgentInstanceBuffer()
+void SimulationManager::configureAgentInstanceBuffer()
 {
     ZeroMemory(&agent_inst_buff_desc, sizeof(agent_inst_buff_desc));
     agent_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -174,7 +175,7 @@ void SwarmManager::configureAgentInstanceBuffer()
 }
 
 
-void SwarmManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
+void SimulationManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
     // Update current world.
     cb_cpu->obj_world = DirectX::XMMatrixTranspose(agent_world);
@@ -194,7 +195,7 @@ void SwarmManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _conte
 }
 
 
-void SwarmManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context)
+void SimulationManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
     // Update current world.
     cb_cpu->obj_world = DirectX::XMMatrixTranspose(nav_world);
@@ -210,11 +211,11 @@ void SwarmManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _contex
     _context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
     _context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    _context->DrawIndexedInstanced(agent_model->getNumIndices(), grid_size_x * grid_size_y, 0, 0, 0);
+    _context->DrawIndexedInstanced(agent_model->getNumIndices(), level->data.size(), 0, 0, 0);
 }
 
 
-void SwarmManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
+void SimulationManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
 {
     D3D11_MAPPED_SUBRESOURCE mapped_buffer;
     ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -227,7 +228,7 @@ void SwarmManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceC
 }
 
 
-void SwarmManager::updateAgentInstanceBuffer()
+void SimulationManager::updateAgentInstanceBuffer()
 {
     HRESULT hr = { 0 };
 

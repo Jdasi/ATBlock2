@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "Renderer.h"
 #include "Vertex.h"
@@ -8,15 +9,16 @@
 #include "ShaderData.h"
 #include "SwarmAgent.h"
 #include "NavNode.h"
+#include "Level.h"
 
 struct GameData;
 struct DrawData;
 
-class SwarmManager
+class SimulationManager
 {
 public:
-    SwarmManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents);
-    ~SwarmManager();
+    SimulationManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents);
+    ~SimulationManager();
 
     void tick(GameData* _gd);
     void draw(DrawData* _dd);
@@ -55,8 +57,7 @@ private:
     std::vector<NavNode> nav_nodes;
     DirectX::XMMATRIX nav_world = DirectX::XMMatrixIdentity();
 
-    int grid_size_x;
-    int grid_size_y;
+    std::unique_ptr<Level> level;
     int grid_scale;
 
 };

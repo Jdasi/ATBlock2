@@ -47,9 +47,6 @@
     <ClCompile Include="..\src\GameObject.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SwarmManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\VBModel.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
@@ -61,6 +58,12 @@
     </ClCompile>
     <ClCompile Include="..\src\NavNode.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SimulationManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FileIO.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,9 +115,6 @@
     <ClInclude Include="..\src\Core.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SwarmManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\VBModel.h">
       <Filter>Assets</Filter>
     </ClInclude>
@@ -129,6 +129,15 @@
     </ClInclude>
     <ClInclude Include="..\src\NavNode.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SimulationManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Level.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\FileIO.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

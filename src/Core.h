@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "InputHandler.h"
 #include "VBModelManager.h"
-#include "SwarmManager.h"
+#include "SimulationManager.h"
 
 // Data.
 #include "GameData.h"

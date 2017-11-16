@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\DXApp.cpp" />
+    <ClCompile Include="..\src\FileIO.cpp" />
     <ClCompile Include="..\src\GameObject.cpp" />
     <ClCompile Include="..\src\InputHandler.cpp" />
     <ClCompile Include="..\src\JTime.cpp" />
@@ -28,7 +29,7 @@
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\SimpleTimer.cpp" />
     <ClCompile Include="..\src\SwarmAgent.cpp" />
-    <ClCompile Include="..\src\SwarmManager.cpp" />
+    <ClCompile Include="..\src\SimulationManager.cpp" />
     <ClCompile Include="..\src\VBModel.cpp" />
     <ClCompile Include="..\src\VBModelManager.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
@@ -41,18 +42,20 @@
     <ClInclude Include="..\src\DXApp.h" />
     <ClInclude Include="..\src\DXMathHelper.h" />
     <ClInclude Include="..\src\DXUtil.h" />
+    <ClInclude Include="..\src\FileIO.h" />
     <ClInclude Include="..\src\GameAction.h" />
     <ClInclude Include="..\src\GameData.h" />
     <ClInclude Include="..\src\GameObject.h" />
     <ClInclude Include="..\src\InputHandler.h" />
     <ClInclude Include="..\src\JTime.h" />
     <ClInclude Include="..\src\Keybinding.h" />
+    <ClInclude Include="..\src\Level.h" />
     <ClInclude Include="..\src\NavNode.h" />
     <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\ShaderData.h" />
     <ClInclude Include="..\src\SimpleTimer.h" />
     <ClInclude Include="..\src\SwarmAgent.h" />
-    <ClInclude Include="..\src\SwarmManager.h" />
+    <ClInclude Include="..\src\SimulationManager.h" />
     <ClInclude Include="..\src\VBModel.h" />
     <ClInclude Include="..\src\VBModelManager.h" />
     <ClInclude Include="..\src\Vertex.h" />
