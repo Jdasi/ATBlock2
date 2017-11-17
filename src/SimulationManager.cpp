@@ -23,6 +23,9 @@ SimulationManager::SimulationManager(Renderer* _renderer, VBModel* _agent_model,
         agents[i].setColor(1, 0, 0, 1);
     }
 
+    // Lazy debug.
+    agents[0].setColor(1, 1, 0, 1);
+
     createConstantBuffers(_renderer);
     createScene(_renderer);
     configureAgentInstanceBuffer();
@@ -39,19 +42,28 @@ SimulationManager::~SimulationManager()
 
 void SimulationManager::tick(GameData* _gd)
 {
-    /*
+    DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
+    cam_pos.z = 0;
+
     // Perform all swarm behaviour ..
+    int i = 0;
     for (SwarmAgent& agent : agents)
     {
-        agent.adjustPos(0, 2 * JTime::getDeltaTime(), 0);
+        if (i == 0) // Skip agent 0 as we're using it as a debug cursor.
+        {
+            ++i;
+            continue;
+        }
+
+        agent.setSeekPos(cam_pos); // Debug seek.
+        agent.tick(_gd);
     }
-    */
 
-    DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
-    agents[0].setPos(DirectX::XMFLOAT3(cam_pos.x, cam_pos.y, 0));
+    // DEBUG: Calculate what tile the cursor is sat in...
+    auto& cursor = agents[0];
+    cursor.setPos(cam_pos);
 
-    // Calculate what tile the agent is sat in...
-    auto& pos = agents[0].getPos();
+    auto& pos = cursor.getPos();
     float half_scale = grid_scale * 0.5f;
 
     auto offsetx = pos.x + (grid_scale * 0.5f);
@@ -62,7 +74,7 @@ void SimulationManager::tick(GameData* _gd)
 
     int index = (iy * level->width) + ix;
 
-    std::cout << "Agent is in tile: " << index << std::endl;
+    std::cout << "Cursor is in tile: " << index << std::endl;
 
     // Update the instance buffer after behaviour tick ..
     updateAgentInstanceBuffer();
@@ -217,11 +229,11 @@ void SimulationManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _c
 
 void SimulationManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
 {
-    D3D11_MAPPED_SUBRESOURCE mapped_buffer;
-    ZeroMemory(&mapped_buffer, sizeof(D3D11_MAPPED_SUBRESOURCE));
+    D3D11_MAPPED_SUBRESOURCE mapped_resource;
+    ZeroMemory(&mapped_resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-    HRESULT hr = _context->Map(cb_gpu, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
-    memcpy(mapped_buffer.pData, cb_cpu, sizeof(CBPerObject));
+    HRESULT hr = _context->Map(cb_gpu, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource);
+    memcpy(mapped_resource.pData, cb_cpu, sizeof(CBPerObject));
     _context->Unmap(cb_gpu, 0);
 
     _context->VSSetConstantBuffers(0, 1, &cb_gpu);
