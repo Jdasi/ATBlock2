@@ -7,6 +7,7 @@ NavNode::NavNode(const float _matrix_scale)
     : pos(0, 0, 0)
     , node_index(0)
     , matrix_scale(_matrix_scale)
+    , distance(0)
 {
     setWalkable(true);
 }
@@ -55,6 +56,18 @@ void NavNode::setWalkable(const bool _walkable)
     walkable = _walkable;
 
     color = DirectX::XMFLOAT4(val, val, val, 1);
+}
+
+
+int NavNode::getDistance() const
+{
+    return distance;
+}
+
+
+void NavNode::setDistance(const int _distance)
+{
+    distance = _distance;
 }
 
 

@@ -38,6 +38,8 @@ private:
 
     void setSwarmDestination(GameData* _gd);
     bool posWithinSimBounds(const DirectX::XMFLOAT3& _pos);
+    void processDijkstrasAlgorithm(const int _start_index);
+    std::vector<NavNode*> getNodeNeighbours(const int _center_tile);
 
     Renderer* renderer;
     VBModelFactory* vbmf;

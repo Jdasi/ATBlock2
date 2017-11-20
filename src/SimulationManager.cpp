@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 #include "SimulationManager.h"
 #include "VBModelFactory.h"
@@ -7,6 +8,7 @@
 #include "DrawData.h"
 #include "Camera.h"
 #include "JTime.h"
+#include "JHelper.h"
 #include "FileIO.h"
 
 
@@ -257,6 +259,7 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
     if (!posWithinSimBounds(pos))
         return;
 
+    // Calculate where the click was.
     float half_scale = grid_scale * 0.5f;
 
     auto offsetx = pos.x + half_scale;
@@ -270,6 +273,9 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
     if (!nav_nodes[index].isWalkable())
         return;
 
+    processDijkstrasAlgorithm(index);
+
+    // Put indicator in the center of the tile for visual reference.
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
     snap_pos.x = ix * grid_scale;
     snap_pos.y = iy * grid_scale;
@@ -291,4 +297,76 @@ bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
     }
 
     return true;
+}
+
+
+void SimulationManager::processDijkstrasAlgorithm(const int _start_index)
+{
+    int UNVISITED = 99999;
+    int num_walkable = 0;
+
+    // Reset grid ready for new evaluation.
+    for (auto& node : nav_nodes)
+    {
+        node.setDistance(UNVISITED);
+
+        if (node.isWalkable())
+            ++num_walkable;
+    }
+
+    // Set up starting node & visit list.
+    auto& start_node = nav_nodes[_start_index];
+    start_node.setDistance(0);
+
+    std::vector<NavNode*> to_visit;
+    to_visit.reserve(num_walkable);
+    to_visit.push_back(&start_node);
+
+    // Evaluate distances.
+    for (int i = 0; i < num_walkable; ++i)
+    {
+        auto* node = to_visit[i];
+        auto neighbours = getNodeNeighbours(node->getNodeIndex());
+
+        for (auto* neighbour : neighbours)
+        {
+            if (!neighbour->isWalkable() ||
+                neighbour->getDistance() != UNVISITED)
+            {
+                continue;
+            }
+
+            neighbour->setDistance(node->getDistance() + 1);
+            to_visit.push_back(neighbour);
+        }
+    }
+}
+
+
+std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_tile)
+{
+    std::vector<NavNode*> neighbours;
+    neighbours.reserve(4);
+
+    auto coords = JHelper::calculateCoords(_center_tile, level->width);
+    auto num_nodes = nav_nodes.size();
+
+    int left = JHelper::calculateIndex(coords.x - 1, coords.y, level->width);
+    int right = JHelper::calculateIndex(coords.x + 1, coords.y, level->width);
+    int up = JHelper::calculateIndex(coords.x, coords.y + 1, level->width);
+    int down = JHelper::calculateIndex(coords.x, coords.y - 1, level->width);
+
+    if (JHelper::validIndex(left, num_nodes))
+        neighbours.push_back(&nav_nodes[left]);
+
+    if (JHelper::validIndex(right, num_nodes))
+        neighbours.push_back(&nav_nodes[right]);
+
+    if (JHelper::validIndex(up, num_nodes))
+        neighbours.push_back(&nav_nodes[up]);
+
+    if (JHelper::validIndex(down, num_nodes))
+        neighbours.push_back(&nav_nodes[down]);
+
+    return neighbours;
 }

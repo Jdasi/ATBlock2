@@ -18,6 +18,9 @@ public:
     bool isWalkable() const;
     void setWalkable(const bool _walkable);
 
+    int getDistance() const;
+    void setDistance(const int _distance);
+
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
 
 private:
@@ -27,5 +30,6 @@ private:
     int node_index;
     float matrix_scale;
     bool walkable;
+    int distance;
 
 };

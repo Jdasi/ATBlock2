@@ -25,6 +25,7 @@
     <ClCompile Include="..\src\FileIO.cpp" />
     <ClCompile Include="..\src\GameObject.cpp" />
     <ClCompile Include="..\src\InputHandler.cpp" />
+    <ClCompile Include="..\src\JHelper.cpp" />
     <ClCompile Include="..\src\JTime.cpp" />
     <ClCompile Include="..\src\NavNode.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="..\src\GameData.h" />
     <ClInclude Include="..\src\GameObject.h" />
     <ClInclude Include="..\src\InputHandler.h" />
+    <ClInclude Include="..\src\JHelper.h" />
     <ClInclude Include="..\src\JTime.h" />
     <ClInclude Include="..\src\Keybinding.h" />
     <ClInclude Include="..\src\Level.h" />

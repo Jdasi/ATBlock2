@@ -74,6 +74,9 @@
     <ClCompile Include="..\src\VBModelFactory.cpp">
       <Filter>Managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\JHelper.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -153,6 +156,9 @@
     </ClInclude>
     <ClInclude Include="..\src\VBModelFactory.h">
       <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\JHelper.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
