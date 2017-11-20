@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "InputHandler.h"
 #include "JTime.h"
+#include "GameData.h"
 
 
 Camera::Camera(const float _fov, const float _ar, const float _near, const float _far,

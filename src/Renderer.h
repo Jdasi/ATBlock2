@@ -46,6 +46,12 @@ private:
     bool createDepthStencil();
     bool createShaders();
 
+    bool createDefaultShader(std::vector<char>& _vs_data, std::vector<char>& _ps_data);
+    bool createInstancedShader(std::vector<char>& _vs_data, std::vector<char>& _ps_data);
+
+    bool compileShaderFromHLSL(const std::string& _name, ShaderData* _shader,
+        std::vector<char>& _vs_data, std::vector<char>& _ps_data);
+
     Window* window;
     DirectX::XMFLOAT4 clear_color;
 

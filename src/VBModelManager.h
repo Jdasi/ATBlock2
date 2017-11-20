@@ -3,9 +3,8 @@
 #include <map>
 #include <memory>
 
-#include "VBModel.h"
-
-class Renderer;
+#include "Square.h"
+#include "Renderer.h"
 
 class VBModelManager
 {
@@ -13,13 +12,10 @@ public:
     VBModelManager(Renderer* _renderer);
     ~VBModelManager() = default;
 
-    VBModel* getModel(const std::string& _name);
+    std::unique_ptr<Square> createSquare(const Renderer::ShaderType& _shader_type =
+        Renderer::ShaderType::DEFAULT);
 
 private:
-    VBModel* createModelEntry(const std::string& _file_name);
-
     Renderer* renderer;
-
-    std::map<std::string, std::unique_ptr<VBModel>> vb_models;
 
 };

@@ -68,6 +68,12 @@
     <ClCompile Include="..\src\DXMathHelper.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Square.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBGO.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -142,12 +148,24 @@
     <ClInclude Include="..\src\FileIO.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Square.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBGO.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Shaders\PixelShader.hlsl">
+    <FxCompile Include="..\Shaders\InstancedPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\Shaders\VertexShader.hlsl">
+    <FxCompile Include="..\Shaders\InstancedVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\DefaultPixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\DefaultVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

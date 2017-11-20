@@ -7,23 +7,10 @@ VBModelManager::VBModelManager(Renderer* _renderer)
 {
 }
 
-
-VBModel* VBModelManager::getModel(const std::string& _name)
+std::unique_ptr<Square> VBModelManager::createSquare(const Renderer::ShaderType& _shader_type)
 {
-    auto entry = vb_models.find(_name);
-    if (entry != vb_models.end())
-        return entry->second.get();
+    auto model = std::make_unique<Square>(renderer);
+    model->setShader(renderer->getShaderData(_shader_type));
 
-    return createModelEntry(_name);
-}
-
-
-VBModel* VBModelManager::createModelEntry(const std::string& _file_name)
-{
-    auto model = std::make_unique<VBModel>(renderer);
-    auto model_p = model.get();
-
-    vb_models[_file_name] = std::move(model);
-
-    return model_p;
+    return std::move(model);
 }

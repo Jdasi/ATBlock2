@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "Vertex.h"
 #include "VBModel.h"
+#include "VBGO.h"
 #include "ShaderData.h"
 #include "SwarmAgent.h"
 #include "NavNode.h"
@@ -13,11 +14,12 @@
 
 struct GameData;
 struct DrawData;
+class VBModelManager;
 
 class SimulationManager
 {
 public:
-    SimulationManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents);
+    SimulationManager(Renderer* _renderer, VBModelManager* _vbmm);
     ~SimulationManager();
 
     void tick(GameData* _gd);
@@ -34,7 +36,10 @@ private:
     void updateConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _context);
     void updateAgentInstanceBuffer();
 
+    void setSwarmDestination(GameData* _gd);
+
     Renderer* renderer;
+    VBModelManager* vbmm;
 
     // Constant buffer stuff.
     ID3D11Buffer* cb_gpu;
@@ -48,7 +53,7 @@ private:
     std::vector<SwarmAgent> agents;
     DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
 
-    VBModel* agent_model;
+    std::unique_ptr<VBModel> agent_model;
     int num_agents;
 
     // Scene.
@@ -59,5 +64,9 @@ private:
 
     std::unique_ptr<Level> level;
     int grid_scale;
+
+    // Helper stuff.
+    std::unique_ptr<VBGO> cursor;
+    std::unique_ptr<VBGO> waypoint_indicator;
 
 };

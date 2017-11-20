@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Core.h"
+#include "DXMathHelper.h"
+
+struct GameData;
+struct DrawData;
 
 class GameObject
 {

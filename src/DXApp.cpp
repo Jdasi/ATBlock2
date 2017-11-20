@@ -2,6 +2,7 @@
 
 #include "DXApp.h"
 #include "JTime.h"
+#include "VBGO.h"
 
 
 // Forward declaration of Window Procedure.
@@ -18,6 +19,7 @@ DXApp::DXApp(HINSTANCE _hinstance)
 
 DXApp::~DXApp()
 {
+    VBGO::cleanUp();
 }
 
 
@@ -50,7 +52,8 @@ void DXApp::initObjects()
 {
     input_handler = std::make_unique<InputHandler>();
     vbmm = std::make_unique<VBModelManager>(renderer.get());
-    simulation_manager = std::make_unique<SimulationManager>(renderer.get(), vbmm->getModel("triangle"), 10000);
+    simulation_manager = std::make_unique<SimulationManager>(
+        renderer.get(), vbmm.get());
 
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(), 0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
     camera->setPos(0, 0, -50.0f);
@@ -62,6 +65,8 @@ void DXApp::initObjects()
     // Draw Data stuff.
     draw_data.renderer = renderer.get();
     draw_data.camera = camera.get();
+
+    VBGO::init(renderer.get());
 }
 
 
@@ -120,6 +125,7 @@ void DXApp::render()
 {
     renderer->beginFrame();
 
+    VBGO::updateConstantBuffers(&draw_data);
     simulation_manager->draw(&draw_data);
 
     renderer->endFrame();

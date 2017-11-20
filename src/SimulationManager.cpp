@@ -1,20 +1,31 @@
 #include <iostream>
 
 #include "SimulationManager.h"
+#include "VBModelManager.h"
+#include "InputHandler.h"
+#include "GameData.h"
 #include "DrawData.h"
 #include "Camera.h"
 #include "JTime.h"
 #include "FileIO.h"
 
 
-SimulationManager::SimulationManager(Renderer* _renderer, VBModel* _agent_model, const int _num_agents)
+SimulationManager::SimulationManager(Renderer* _renderer, VBModelManager* _vbmm)
     : renderer(_renderer)
-    , agent_model(_agent_model)
-    , num_agents(_num_agents)
+    , vbmm(_vbmm)
+    , num_agents(1)
     , grid_scale(10)
 {
-    agents.assign(_num_agents, SwarmAgent());
-    for (int i = 0; i < _num_agents; ++i)
+    agent_model = vbmm->createSquare(Renderer::ShaderType::INSTANCED);
+
+    cursor = std::make_unique<VBGO>(vbmm->createSquare());
+    cursor->setColor(1, 1, 0);
+
+    waypoint_indicator = std::make_unique<VBGO>(vbmm->createSquare());
+    waypoint_indicator->setColor(0, 1, 0);
+
+    agents.assign(num_agents, SwarmAgent());
+    for (int i = 0; i < num_agents; ++i)
     {
         float rand_x = ((float)(rand() % 2000) / 10) - 100;
         float rand_y = ((float)(rand() % 2000) / 10) - 100;
@@ -22,9 +33,6 @@ SimulationManager::SimulationManager(Renderer* _renderer, VBModel* _agent_model,
         agents[i].setPos(rand_x, rand_y, 0);
         agents[i].setColor(1, 0, 0, 1);
     }
-
-    // Lazy debug.
-    agents[0].setColor(1, 1, 0, 1);
 
     createConstantBuffers(_renderer);
     createScene(_renderer);
@@ -43,38 +51,21 @@ SimulationManager::~SimulationManager()
 void SimulationManager::tick(GameData* _gd)
 {
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
-    cam_pos.z = 0;
+    cursor->setPos(cam_pos.x, cam_pos.y, 0);
+
+    cursor->tick(_gd);
+    waypoint_indicator->tick(_gd);
+    waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
+    waypoint_indicator->setScale(2 + cos(5 * JTime::getTime()));
 
     // Perform all swarm behaviour ..
-    int i = 0;
     for (SwarmAgent& agent : agents)
     {
-        if (i == 0) // Skip agent 0 as we're using it as a debug cursor.
-        {
-            ++i;
-            continue;
-        }
-
-        agent.setSeekPos(cam_pos); // Debug seek.
+        agent.setSeekPos(waypoint_indicator->getPos()); // Debug seek.
         agent.tick(_gd);
     }
 
-    // DEBUG: Calculate what tile the cursor is sat in...
-    auto& cursor = agents[0];
-    cursor.setPos(cam_pos);
-
-    auto& pos = cursor.getPos();
-    float half_scale = grid_scale * 0.5f;
-
-    auto offsetx = pos.x + (grid_scale * 0.5f);
-    int ix = static_cast<int>(offsetx) / grid_scale;
-
-    auto offsety = pos.y + (grid_scale * 0.5f);
-    int iy = static_cast<int>(offsety) / grid_scale;
-
-    int index = (iy * level->width) + ix;
-
-    std::cout << "Cursor is in tile: " << index << std::endl;
+    setSwarmDestination(_gd);
 
     // Update the instance buffer after behaviour tick ..
     updateAgentInstanceBuffer();
@@ -103,6 +94,11 @@ void SimulationManager::draw(DrawData* _dd)
 
     _dd->renderer->setRenderStyle(Renderer::RenderStyle::WIREFRAME);
     drawScene(device, context);
+
+    // Draw seperate VBGOs last as they use their own buffers.
+    _dd->renderer->setRenderStyle(Renderer::RenderStyle::SOLID);
+    cursor->draw(_dd);
+    waypoint_indicator->draw(_dd);
 }
 
 
@@ -120,7 +116,7 @@ void SimulationManager::createConstantBuffers(Renderer* _renderer)
     cb_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     cb_desc.MiscFlags = 0;
 
-    // CPU side constant buffer.
+    // Create constant buffer (cpu side).
     cb_cpu = (CBPerObject*)_aligned_malloc(sizeof(CBPerObject), 16);
     ZeroMemory(cb_cpu, sizeof(CBPerObject));
 
@@ -134,12 +130,14 @@ void SimulationManager::createConstantBuffers(Renderer* _renderer)
 
 void SimulationManager::createScene(Renderer* _renderer)
 {
+    // Load the level from file.
     level = std::make_unique<Level>(FileIO::loadLevel("level1.txt"));
 
+    // Create the grid tiles (aka Navigation Nodes).
     int grid_size = level->width * level->height;
-
     nav_nodes.assign(grid_size, NavNode(grid_scale));
 
+    // Instance buffer to render the grid tiles.
     D3D11_BUFFER_DESC scene_inst_buff_desc;
     ZeroMemory(&scene_inst_buff_desc, sizeof(scene_inst_buff_desc));
     scene_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -247,4 +245,28 @@ void SimulationManager::updateAgentInstanceBuffer()
     SAFE_RELEASE(agent_inst_buff);
     hr = renderer->getDevice()->CreateBuffer(&agent_inst_buff_desc,
         &agent_inst_res_data, &agent_inst_buff);
+}
+
+
+void SimulationManager::setSwarmDestination(GameData* _gd)
+{
+    if (!_gd->input->getKeyDown('V'))
+        return;
+    
+    auto& pos = cursor->getPos();
+
+    float half_scale = grid_scale * 0.5f;
+
+    auto offsetx = pos.x + half_scale;
+    int ix = static_cast<int>(offsetx) / grid_scale;
+
+    auto offsety = pos.y + half_scale;
+    int iy = static_cast<int>(offsety) / grid_scale;
+
+    int index = (iy * level->width) + ix;
+
+    waypoint_indicator->setPos(pos);
+
+    std::cout << "Math index: " << index << " -- Tile index: "
+              << nav_nodes[index].getNodeIndex() << std::endl;
 }

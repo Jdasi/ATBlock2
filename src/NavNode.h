@@ -11,7 +11,6 @@ public:
     const DirectX::XMFLOAT3& getPos() const;
     void setPos(const DirectX::XMFLOAT3& _pos);
     void setPos(const float _x, const float _y, const float _z);
-    void adjustPos(const float _x, const float _y, const float _z);
 
     int getNodeIndex() const;
     void setNodeIndex(const int _node_index);

@@ -3,18 +3,17 @@
 #include "VBModel.h"
 #include "DrawData.h"
 #include "Camera.h"
+#include "Renderer.h"
+#include "Vertex.h"
 
 
-VBModel::VBModel(Renderer* _renderer)
+VBModel::VBModel()
     : vertex_buffer(nullptr)
     , index_buffer(nullptr)
     , topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
     , num_vertices(0)
     , num_indices(0)
 {
-    shader = _renderer->getShaderData(Renderer::ShaderType::DEFAULT);
-
-    createMesh(_renderer);
 }
 
 
@@ -65,6 +64,12 @@ ShaderData* VBModel::getShader() const
 }
 
 
+void VBModel::setShader(ShaderData* _shader)
+{
+    shader = _shader;
+}
+
+
 const D3D_PRIMITIVE_TOPOLOGY& VBModel::getTopology() const
 {
     return topology;
@@ -80,34 +85,6 @@ const UINT& VBModel::getNumVertices() const
 const UINT& VBModel::getNumIndices() const
 {
     return num_indices;
-}
-
-
-void VBModel::createMesh(Renderer* _renderer)
-{
-    // TODO: replace this with loading from file ..
-
-    auto device = _renderer->getDevice();
-    auto context = _renderer->getDeviceContext();
-
-    Vertex vertices[] =
-    {
-        Vertex(-0.5f, -0.5f, 0),
-        Vertex(-0.5f,  0.5f, 0),
-        Vertex( 0.5f,  0.5f, 0),
-        Vertex( 0.5f, -0.5f, 0),
-    };
-    num_vertices = ARRAYSIZE(vertices);
-
-    DWORD indices[] =
-    {
-        0, 1, 2,
-        0, 2, 3
-    };
-    num_indices = ARRAYSIZE(indices);
-
-    buildVB(_renderer, num_vertices, vertices);
-    buildIB(_renderer, indices);
 }
 
 

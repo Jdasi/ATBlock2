@@ -30,14 +30,6 @@ void NavNode::setPos(const float _x, const float _y, const float _z)
 }
 
 
-void NavNode::adjustPos(const float _x, const float _y, const float _z)
-{
-    pos.x += _x;
-    pos.y += _y;
-    pos.z += _z;
-}
-
-
 int NavNode::getNodeIndex() const
 {
     return node_index;
@@ -56,6 +48,7 @@ bool NavNode::isWalkable() const
 }
 
 
+// Walkable = white tile; Unwalkable = black tile.
 void NavNode::setWalkable(const bool _walkable)
 {
     float val = _walkable ? 1.0f : 0.0f;

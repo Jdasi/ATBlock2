@@ -256,33 +256,57 @@ bool Renderer::createDepthStencil()
 
 bool Renderer::createShaders()
 {
+    std::vector<char> vs_data;
+    std::vector<char> ps_data;
+
+    if (!createDefaultShader(vs_data, ps_data))
+        return false;
+
+    if (!createInstancedShader(vs_data, ps_data))
+        return false;
+
+    return true;
+}
+
+
+bool Renderer::createDefaultShader(std::vector<char>& _vs_data, std::vector<char>& _ps_data)
+{
     HRESULT hr;
+
+    // Compiled Shader.
     auto shader = std::make_unique<ShaderData>();
+    compileShaderFromHLSL("Default", shader.get(), _vs_data, _ps_data);
 
-    using namespace std;
+    // Shader Layout.
+    D3D11_INPUT_ELEMENT_DESC layout[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+    };
+    UINT num_elems = ARRAYSIZE(layout);
 
-    // Create shaders.
-    ifstream vs_file("Resources/Shaders/VertexShader.cso", ios::binary);
-    ifstream ps_file("Resources/Shaders/PixelShader.cso", ios::binary);
-
-    vector<char> vs_data = { istreambuf_iterator<char>(vs_file), istreambuf_iterator<char>() };
-    vector<char> ps_data = { istreambuf_iterator<char>(ps_file), istreambuf_iterator<char>() };
-
-    hr = d3d_device->CreateVertexShader(vs_data.data(), vs_data.size(), NULL, &shader->vertex_shader);
+    hr = d3d_device->CreateInputLayout(layout, num_elems, _vs_data.data(), _vs_data.size(), &shader->input_layout);
     if (FAILED(hr))
     {
-        std::cout << "Failed to create Vertex Shader" << std::endl;
+        std::cout << "Failed to create Input Layout" << std::endl;
         return false;
     }
 
-    hr = d3d_device->CreatePixelShader(ps_data.data(), ps_data.size(), NULL, &shader->pixel_shader);
-    if (FAILED(hr))
-    {
-        std::cout << "Failed to create Pixel Shader" << std::endl;
-        return false;
-    }
+    shaders.push_back(std::move(shader));
 
-    // Create input layouts.
+    return true;
+}
+
+
+bool Renderer::createInstancedShader(std::vector<char>& _vs_data, std::vector<char>& _ps_data)
+{
+    HRESULT hr;
+
+    // Compiled Shader.
+    auto shader = std::make_unique<ShaderData>();
+    compileShaderFromHLSL("Instanced", shader.get(), _vs_data, _ps_data);
+
+    // Shader Layout.
     D3D11_INPUT_ELEMENT_DESC layout[] =
     {
         // Data from the Vertex Buffer.
@@ -294,7 +318,7 @@ bool Renderer::createShaders()
     };
     UINT num_elems = ARRAYSIZE(layout);
 
-    hr = d3d_device->CreateInputLayout(layout, num_elems, vs_data.data(), vs_data.size(), &shader->input_layout);
+    hr = d3d_device->CreateInputLayout(layout, num_elems, _vs_data.data(), _vs_data.size(), &shader->input_layout);
     if (FAILED(hr))
     {
         std::cout << "Failed to create Input Layout" << std::endl;
@@ -302,6 +326,38 @@ bool Renderer::createShaders()
     }
 
     shaders.push_back(std::move(shader));
+
+    return true;
+}
+
+
+bool Renderer::compileShaderFromHLSL(const std::string& _name, ShaderData* _shader,
+    std::vector<char>& _vs_data, std::vector<char>& _ps_data)
+{
+    using namespace std;
+
+    // Create shaders.
+    ifstream vs_file("Resources/Shaders/" + _name + "VertexShader.cso", ios::binary);
+    ifstream ps_file("Resources/Shaders/" + _name + "PixelShader.cso", ios::binary);
+
+    _vs_data = { istreambuf_iterator<char>(vs_file), istreambuf_iterator<char>() };
+    _ps_data = { istreambuf_iterator<char>(ps_file), istreambuf_iterator<char>() };
+
+    HRESULT hr = d3d_device->CreateVertexShader(_vs_data.data(), _vs_data.size(), NULL, &_shader->vertex_shader);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Vertex Shader: " << _name << std::endl;
+        return false;
+    }
+
+    hr = d3d_device->CreatePixelShader(_ps_data.data(), _ps_data.size(), NULL, &_shader->pixel_shader);
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to create Pixel Shader" << _name << std::endl;
+        return false;
+    }
+
+    _shader->name = _name;
 
     return true;
 }
