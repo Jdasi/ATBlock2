@@ -4,7 +4,7 @@
 #include "Window.h"
 #include "Renderer.h"
 #include "InputHandler.h"
-#include "VBModelManager.h"
+#include "VBModelFactory.h"
 #include "SimulationManager.h"
 
 // Data.

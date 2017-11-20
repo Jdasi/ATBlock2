@@ -14,12 +14,12 @@
 
 struct GameData;
 struct DrawData;
-class VBModelManager;
+class VBModelFactory;
 
 class SimulationManager
 {
 public:
-    SimulationManager(Renderer* _renderer, VBModelManager* _vbmm);
+    SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf);
     ~SimulationManager();
 
     void tick(GameData* _gd);
@@ -39,7 +39,7 @@ private:
     void setSwarmDestination(GameData* _gd);
 
     Renderer* renderer;
-    VBModelManager* vbmm;
+    VBModelFactory* vbmf;
 
     // Constant buffer stuff.
     ID3D11Buffer* cb_gpu;

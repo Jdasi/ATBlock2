@@ -30,7 +30,7 @@ private:
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<InputHandler> input_handler;
-    std::unique_ptr<VBModelManager> vbmm;
+    std::unique_ptr<VBModelFactory> vbmf;
     std::unique_ptr<SimulationManager> simulation_manager;
 
     // Data.

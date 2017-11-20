@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "SimulationManager.h"
-#include "VBModelManager.h"
+#include "VBModelFactory.h"
 #include "InputHandler.h"
 #include "GameData.h"
 #include "DrawData.h"
@@ -10,18 +10,18 @@
 #include "FileIO.h"
 
 
-SimulationManager::SimulationManager(Renderer* _renderer, VBModelManager* _vbmm)
+SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
-    , vbmm(_vbmm)
+    , vbmf(_vbmf)
     , num_agents(1)
     , grid_scale(10)
 {
-    agent_model = vbmm->createSquare(Renderer::ShaderType::INSTANCED);
+    agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
 
-    cursor = std::make_unique<VBGO>(vbmm->createSquare());
+    cursor = std::make_unique<VBGO>(vbmf->createSquare());
     cursor->setColor(1, 1, 0);
 
-    waypoint_indicator = std::make_unique<VBGO>(vbmm->createSquare());
+    waypoint_indicator = std::make_unique<VBGO>(vbmf->createSquare());
     waypoint_indicator->setColor(0, 1, 0);
 
     agents.assign(num_agents, SwarmAgent());
@@ -265,7 +265,10 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
 
     int index = (iy * level->width) + ix;
 
-    waypoint_indicator->setPos(pos);
+    DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
+    snap_pos.x = ix * grid_scale;
+    snap_pos.y = iy * grid_scale;
+    waypoint_indicator->setPos(snap_pos);
 
     std::cout << "Math index: " << index << " -- Tile index: "
               << nav_nodes[index].getNodeIndex() << std::endl;

@@ -50,9 +50,6 @@
     <ClCompile Include="..\src\VBModel.cpp">
       <Filter>Assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\VBModelManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SwarmAgent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -73,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="..\src\VBGO.cpp">
       <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\VBModelFactory.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -127,9 +127,6 @@
     <ClInclude Include="..\src\VBModel.h">
       <Filter>Assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\VBModelManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ShaderData.h">
       <Filter>Assets</Filter>
     </ClInclude>
@@ -153,6 +150,9 @@
     </ClInclude>
     <ClInclude Include="..\src\VBGO.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\VBModelFactory.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

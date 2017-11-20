@@ -6,11 +6,11 @@
 #include "Square.h"
 #include "Renderer.h"
 
-class VBModelManager
+class VBModelFactory
 {
 public:
-    VBModelManager(Renderer* _renderer);
-    ~VBModelManager() = default;
+    VBModelFactory(Renderer* _renderer);
+    ~VBModelFactory() = default;
 
     std::unique_ptr<Square> createSquare(const Renderer::ShaderType& _shader_type =
         Renderer::ShaderType::DEFAULT);

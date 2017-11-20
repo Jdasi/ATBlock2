@@ -1,13 +1,13 @@
-#include "VBModelManager.h"
+#include "VBModelFactory.h"
 #include "Renderer.h"
 
 
-VBModelManager::VBModelManager(Renderer* _renderer)
+VBModelFactory::VBModelFactory(Renderer* _renderer)
     : renderer(_renderer)
 {
 }
 
-std::unique_ptr<Square> VBModelManager::createSquare(const Renderer::ShaderType& _shader_type)
+std::unique_ptr<Square> VBModelFactory::createSquare(const Renderer::ShaderType& _shader_type)
 {
     auto model = std::make_unique<Square>(renderer);
     model->setShader(renderer->getShaderData(_shader_type));
