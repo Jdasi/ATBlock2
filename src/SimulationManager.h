@@ -37,6 +37,7 @@ private:
     void updateAgentInstanceBuffer();
 
     void setSwarmDestination(GameData* _gd);
+    bool posWithinSimBounds(const DirectX::XMFLOAT3& _pos);
 
     Renderer* renderer;
     VBModelFactory* vbmf;
@@ -56,7 +57,7 @@ private:
     std::unique_ptr<VBModel> agent_model;
     int num_agents;
 
-    // Scene.
+    // Scene stuff.
     ID3D11Buffer* scene_inst_buff;
 
     std::vector<NavNode> nav_nodes;

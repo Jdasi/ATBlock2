@@ -13,7 +13,7 @@
 SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
-    , num_agents(1)
+    , num_agents(10000)
     , grid_scale(10)
 {
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
@@ -254,6 +254,8 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
         return;
     
     auto& pos = cursor->getPos();
+    if (!posWithinSimBounds(pos))
+        return;
 
     float half_scale = grid_scale * 0.5f;
 
@@ -265,6 +267,9 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
 
     int index = (iy * level->width) + ix;
 
+    if (!nav_nodes[index].isWalkable())
+        return;
+
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
     snap_pos.x = ix * grid_scale;
     snap_pos.y = iy * grid_scale;
@@ -272,4 +277,18 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
 
     std::cout << "Math index: " << index << " -- Tile index: "
               << nav_nodes[index].getNodeIndex() << std::endl;
+}
+
+
+bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
+{
+    float half_scale = grid_scale * 0.5f;
+
+    if (_pos.x + half_scale < 0 || _pos.x + half_scale >= level->width * grid_scale ||
+        _pos.y + half_scale < 0 || _pos.y + half_scale >= level->height * grid_scale)
+    {
+        return false;
+    }
+
+    return true;
 }
