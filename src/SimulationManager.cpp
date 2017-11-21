@@ -1,5 +1,4 @@
 #include <iostream>
-#include <limits>
 
 #include "SimulationManager.h"
 #include "VBModelFactory.h"
@@ -15,7 +14,6 @@
 SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
-    , num_agents(10000)
     , grid_scale(10)
 {
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
@@ -26,19 +24,8 @@ SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
     waypoint_indicator = std::make_unique<VBGO>(vbmf->createSquare());
     waypoint_indicator->setColor(0, 1, 0);
 
-    agents.assign(num_agents, SwarmAgent());
-    for (int i = 0; i < num_agents; ++i)
-    {
-        float rand_x = ((float)(rand() % 2000) / 10) - 100;
-        float rand_y = ((float)(rand() % 2000) / 10) - 100;
-
-        agents[i].setPos(rand_x, rand_y, 0);
-        agents[i].setColor(1, 0, 0, 1);
-    }
-
     createConstantBuffers(_renderer);
     createScene(_renderer);
-    configureAgentInstanceBuffer();
 
     updateSwarmDestination();
 }
@@ -69,11 +56,17 @@ void SimulationManager::tick(GameData* _gd)
         agent.tick(_gd);
     }
 
-    if (_gd->input->getKeyDown('V'))
+    if (_gd->input->getKey('V'))
+        spawnAgent();
+
+    if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
 
-    // Update the instance buffer after behaviour tick ..
-    updateAgentInstanceBuffer();
+    if (agents.size() > 0)
+    {
+        // Update the instance buffer after behaviour tick ..
+        updateAgentInstanceBuffer();
+    }
 }
 
 
@@ -94,8 +87,11 @@ void SimulationManager::draw(DrawData* _dd)
     cb_cpu->proj = DirectX::XMMatrixTranspose(_dd->camera->getProjMat());
     // END CONSTANT BUFFER STUFF -----------------------------------------------
 
-    _dd->renderer->setRenderStyle(Renderer::RenderStyle::SOLID);
-    drawAgents(device, context);
+    if (agents.size() > 0)
+    {
+        _dd->renderer->setRenderStyle(Renderer::RenderStyle::SOLID);
+        drawAgents(device, context);
+    }
 
     _dd->renderer->setRenderStyle(Renderer::RenderStyle::WIREFRAME);
     drawScene(device, context);
@@ -180,7 +176,7 @@ void SimulationManager::configureAgentInstanceBuffer()
 {
     ZeroMemory(&agent_inst_buff_desc, sizeof(agent_inst_buff_desc));
     agent_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
-    agent_inst_buff_desc.ByteWidth = sizeof(SwarmAgent) * num_agents;
+    agent_inst_buff_desc.ByteWidth = sizeof(SwarmAgent) * agents.size();
     agent_inst_buff_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     agent_inst_buff_desc.CPUAccessFlags = 0;
     agent_inst_buff_desc.MiscFlags = 0;
@@ -206,7 +202,7 @@ void SimulationManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _
     _context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
     _context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    _context->DrawIndexedInstanced(agent_model->getNumIndices(), num_agents, 0, 0, 0);
+    _context->DrawIndexedInstanced(agent_model->getNumIndices(), agents.size(), 0, 0, 0);
 }
 
 
@@ -250,6 +246,11 @@ void SimulationManager::updateAgentInstanceBuffer()
     SAFE_RELEASE(agent_inst_buff);
     hr = renderer->getDevice()->CreateBuffer(&agent_inst_buff_desc,
         &agent_inst_res_data, &agent_inst_buff);
+
+    if (FAILED(hr))
+    {
+        std::cout << "Failed to update Agent Instance Buffer\n";
+    }
 }
 
 
@@ -259,17 +260,7 @@ void SimulationManager::updateSwarmDestination()
     if (!posWithinSimBounds(pos))
         return;
 
-    // Calculate where the click was.
-    float half_scale = grid_scale * 0.5f;
-
-    auto offsetx = pos.x + half_scale;
-    int ix = static_cast<int>(offsetx) / grid_scale;
-
-    auto offsety = pos.y + half_scale;
-    int iy = static_cast<int>(offsety) / grid_scale;
-
-    int index = (iy * level->width) + ix;
-
+    int index = posToTileIndex(pos);
     if (!nav_nodes[index].isWalkable())
         return;
 
@@ -278,8 +269,9 @@ void SimulationManager::updateSwarmDestination()
 
     // Put indicator in the center of the tile for visual reference.
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
-    snap_pos.x = ix * grid_scale;
-    snap_pos.y = iy * grid_scale;
+    DirectX::XMINT2 coords = JHelper::calculateCoords(index, level->width);
+    snap_pos.x = coords.x * grid_scale;
+    snap_pos.y = coords.y * grid_scale;
     waypoint_indicator->setPos(snap_pos);
 
     std::cout << "Math index: " << index << " -- Tile index: "
@@ -298,6 +290,22 @@ bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
     }
 
     return true;
+}
+
+
+int SimulationManager::posToTileIndex(const DirectX::XMFLOAT3& _pos)
+{
+    // Calculate where the click was.
+    float half_scale = grid_scale * 0.5f;
+
+    auto offsetx = _pos.x + half_scale;
+    int ix = static_cast<int>(offsetx) / grid_scale;
+
+    auto offsety = _pos.y + half_scale;
+    int iy = static_cast<int>(offsety) / grid_scale;
+
+    int index = (iy * level->width) + ix;
+    return index;
 }
 
 
@@ -407,4 +415,26 @@ std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_til
     }
 
     return neighbours;
+}
+
+
+void SimulationManager::spawnAgent()
+{
+    auto& pos = cursor->getPos();
+    if (!posWithinSimBounds(pos))
+        return;
+
+    int index = posToTileIndex(pos);
+    if (!nav_nodes[index].isWalkable())
+        return;
+
+    agents.push_back(SwarmAgent());
+
+    auto& agent = agents[agents.size() - 1];
+    agent.setPos(pos.x, pos.y, 0);
+    agent.setColor(1, 0, 0, 1);
+
+    std::cout << "Agent spawned, num agents: " << agents.size() << std::endl;;
+
+    configureAgentInstanceBuffer();
 }

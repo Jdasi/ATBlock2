@@ -38,10 +38,14 @@ private:
 
     void updateSwarmDestination();
     bool posWithinSimBounds(const DirectX::XMFLOAT3& _pos);
+    int posToTileIndex(const DirectX::XMFLOAT3& _pos);
+
     void generateDijkstrasDistances(const int _start_index);
     void generateFlowField();
     std::vector<NavNode*> getNodeNeighbours(const int _center_tile,
         const bool _diagonals = false);
+
+    void spawnAgent();
 
     Renderer* renderer;
     VBModelFactory* vbmf;
@@ -59,7 +63,6 @@ private:
     DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
 
     std::unique_ptr<VBModel> agent_model;
-    int num_agents;
 
     // Scene stuff.
     ID3D11Buffer* scene_inst_buff;
