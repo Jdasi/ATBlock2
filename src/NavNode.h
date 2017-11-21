@@ -21,6 +21,11 @@ public:
     int getDistance() const;
     void setDistance(const int _distance);
 
+    const DirectX::XMFLOAT3 getFlowDir() const;
+    void resetFlowDir();
+    void setFlowDir(const DirectX::XMFLOAT3& _dir);
+    void setFlowDir(const float _x, const float _y, const float _z);
+
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
 
 private:
@@ -31,5 +36,7 @@ private:
     float matrix_scale;
     bool walkable;
     int distance;
+
+    DirectX::XMFLOAT3 flow_dir;
 
 };

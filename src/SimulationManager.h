@@ -36,10 +36,12 @@ private:
     void updateConstantBuffer(ID3D11Device* _device, ID3D11DeviceContext* _context);
     void updateAgentInstanceBuffer();
 
-    void setSwarmDestination(GameData* _gd);
+    void updateSwarmDestination();
     bool posWithinSimBounds(const DirectX::XMFLOAT3& _pos);
-    void processDijkstrasAlgorithm(const int _start_index);
-    std::vector<NavNode*> getNodeNeighbours(const int _center_tile);
+    void generateDijkstrasDistances(const int _start_index);
+    void generateFlowField();
+    std::vector<NavNode*> getNodeNeighbours(const int _center_tile,
+        const bool _diagonals = false);
 
     Renderer* renderer;
     VBModelFactory* vbmf;

@@ -51,6 +51,15 @@ DirectX::XMFLOAT3 DirectX::Float3Normalized(const XMFLOAT3& _a)
 }
 
 
+DirectX::XMFLOAT3 DirectX::Float3DirectionAtoB(const XMFLOAT3& _a, const XMFLOAT3& _b)
+{
+    DirectX::XMFLOAT3 sub = Float3SubtractBfromA(_b, _a);
+    sub = DirectX::Float3Normalized(sub);
+
+    return sub;
+}
+
+
 float DirectX::Float3Magnitude(const XMFLOAT3& _a)
 {
     return sqrtf(_a.x * _a.x + _a.y * _a.y + _a.z * _a.z);

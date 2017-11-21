@@ -18,6 +18,7 @@ namespace DirectX
     XMFLOAT3 Float3Mul(const XMFLOAT3& _a, const float _mul);
 
     XMFLOAT3 Float3Normalized(const XMFLOAT3& _a);
+    XMFLOAT3 Float3DirectionAtoB(const XMFLOAT3& _a, const XMFLOAT3& _b);
 
     float Float3Magnitude(const XMFLOAT3& _a);
     float Float3MagnitudeSquared(const XMFLOAT3& _a);

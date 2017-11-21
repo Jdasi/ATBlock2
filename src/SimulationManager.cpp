@@ -39,6 +39,8 @@ SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
     createConstantBuffers(_renderer);
     createScene(_renderer);
     configureAgentInstanceBuffer();
+
+    updateSwarmDestination();
 }
 
 
@@ -53,7 +55,7 @@ SimulationManager::~SimulationManager()
 void SimulationManager::tick(GameData* _gd)
 {
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
-    cursor->setPos(cam_pos.x, cam_pos.y, 0);
+    cursor->setPos(cam_pos.x, cam_pos.y, -1);
 
     cursor->tick(_gd);
     waypoint_indicator->tick(_gd);
@@ -67,7 +69,8 @@ void SimulationManager::tick(GameData* _gd)
         agent.tick(_gd);
     }
 
-    setSwarmDestination(_gd);
+    if (_gd->input->getKeyDown('V'))
+        updateSwarmDestination();
 
     // Update the instance buffer after behaviour tick ..
     updateAgentInstanceBuffer();
@@ -250,11 +253,8 @@ void SimulationManager::updateAgentInstanceBuffer()
 }
 
 
-void SimulationManager::setSwarmDestination(GameData* _gd)
+void SimulationManager::updateSwarmDestination()
 {
-    if (!_gd->input->getKeyDown('V'))
-        return;
-    
     auto& pos = cursor->getPos();
     if (!posWithinSimBounds(pos))
         return;
@@ -273,7 +273,8 @@ void SimulationManager::setSwarmDestination(GameData* _gd)
     if (!nav_nodes[index].isWalkable())
         return;
 
-    processDijkstrasAlgorithm(index);
+    generateDijkstrasDistances(index);
+    generateFlowField();
 
     // Put indicator in the center of the tile for visual reference.
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
@@ -300,7 +301,7 @@ bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 }
 
 
-void SimulationManager::processDijkstrasAlgorithm(const int _start_index)
+void SimulationManager::generateDijkstrasDistances(const int _goal_index)
 {
     int UNVISITED = 99999;
     int num_walkable = 0;
@@ -315,7 +316,7 @@ void SimulationManager::processDijkstrasAlgorithm(const int _start_index)
     }
 
     // Set up starting node & visit list.
-    auto& start_node = nav_nodes[_start_index];
+    auto& start_node = nav_nodes[_goal_index];
     start_node.setDistance(0);
 
     std::vector<NavNode*> to_visit;
@@ -343,30 +344,67 @@ void SimulationManager::processDijkstrasAlgorithm(const int _start_index)
 }
 
 
-std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_tile)
+void SimulationManager::generateFlowField()
+{
+    for (auto& node : nav_nodes)
+    {
+        node.resetFlowDir();
+        if (!node.isWalkable())
+            continue;
+
+        std::vector<NavNode*> neighbours = getNodeNeighbours(node.getNodeIndex(), true);
+
+        NavNode* progress_node = nullptr;
+        int progress = 0;
+
+        for (NavNode* neighbour : neighbours)
+        {
+            int distance = neighbour->getDistance() - node.getDistance();
+
+            if (distance >= progress)
+                continue;
+
+            progress_node = neighbour;
+            progress = distance;
+        }
+
+        if (progress_node == nullptr)
+            continue;
+
+        DirectX::XMFLOAT3 dir = DirectX::Float3DirectionAtoB(
+            node.getPos(), progress_node->getPos());
+        node.setFlowDir(dir);
+    }
+}
+
+
+std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_tile,
+    const bool _diagonals)
 {
     std::vector<NavNode*> neighbours;
-    neighbours.reserve(4);
+    neighbours.reserve(8);
 
     auto coords = JHelper::calculateCoords(_center_tile, level->width);
-    auto num_nodes = nav_nodes.size();
 
-    int left = JHelper::calculateIndex(coords.x - 1, coords.y, level->width);
-    int right = JHelper::calculateIndex(coords.x + 1, coords.y, level->width);
-    int up = JHelper::calculateIndex(coords.x, coords.y + 1, level->width);
-    int down = JHelper::calculateIndex(coords.x, coords.y - 1, level->width);
+    for (int row = coords.y - 1; row <= coords.y + 1; ++row)
+    {
+        for (int col = coords.x - 1; col <= coords.x + 1; ++col)
+        {
+            if ((col < 0 || col >= level->width) ||
+                (row < 0 || row >= level->height) ||
+                (col == coords.x && row == coords.y))
+            {
+                continue;
+            }
 
-    if (JHelper::validIndex(left, num_nodes))
-        neighbours.push_back(&nav_nodes[left]);
+            int diff = abs(col - coords.x) + abs(row - coords.y);
+            if (!_diagonals && diff == 2)
+                continue;
 
-    if (JHelper::validIndex(right, num_nodes))
-        neighbours.push_back(&nav_nodes[right]);
-
-    if (JHelper::validIndex(up, num_nodes))
-        neighbours.push_back(&nav_nodes[up]);
-
-    if (JHelper::validIndex(down, num_nodes))
-        neighbours.push_back(&nav_nodes[down]);
+            int index = JHelper::calculateIndex(col, row, level->width);
+            neighbours.push_back(&nav_nodes[index]);
+        }
+    }
 
     return neighbours;
 }
