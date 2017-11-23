@@ -16,11 +16,11 @@ struct GameData;
 struct DrawData;
 class VBModelFactory;
 
-class SimulationManager
+class Simulation
 {
 public:
-    SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf);
-    ~SimulationManager();
+    Simulation(Renderer* _renderer, VBModelFactory* _vbmf);
+    ~Simulation();
 
     void tick(GameData* _gd);
     void draw(DrawData* _dd);
@@ -42,10 +42,11 @@ private:
 
     void generateDijkstrasDistances(const int _start_index);
     void generateFlowField();
-    std::vector<NavNode*> getNodeNeighbours(const int _center_tile,
+    std::vector<NavNode*> evaluateNodeNeighbours(const int _center_tile,
         const bool _diagonals = false);
 
     void spawnAgent();
+    void shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node);
 
     Renderer* renderer;
     VBModelFactory* vbmf;

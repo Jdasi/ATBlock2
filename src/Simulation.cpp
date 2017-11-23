@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "SimulationManager.h"
+#include "Simulation.h"
 #include "VBModelFactory.h"
 #include "InputHandler.h"
 #include "GameData.h"
@@ -11,7 +11,7 @@
 #include "FileIO.h"
 
 
-SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
+Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
     , grid_scale(10)
@@ -31,7 +31,7 @@ SimulationManager::SimulationManager(Renderer* _renderer, VBModelFactory* _vbmf)
 }
 
 
-SimulationManager::~SimulationManager()
+Simulation::~Simulation()
 {
     SAFE_RELEASE(cb_gpu);
     SAFE_RELEASE(agent_inst_buff);
@@ -39,7 +39,7 @@ SimulationManager::~SimulationManager()
 }
 
 
-void SimulationManager::tick(GameData* _gd)
+void Simulation::tick(GameData* _gd)
 {
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
     cursor->setPos(cam_pos.x, cam_pos.y, -1);
@@ -52,8 +52,23 @@ void SimulationManager::tick(GameData* _gd)
     // Perform all swarm behaviour ..
     for (SwarmAgent& agent : agents)
     {
-        agent.setSeekPos(waypoint_indicator->getPos()); // Debug seek.
         agent.tick(_gd);
+
+        int index = posToTileIndex(agent.getPos());
+        if (!JHelper::validIndex(index, nav_nodes.size()))
+            continue;
+
+        auto& node = nav_nodes[index];
+        agent.setCurrentTileIndex(index);
+
+        if (node.isWalkable())
+        {
+            agent.applySteer(node.getFlowDir());
+        }
+        else
+        {
+            shuntAgentFromNode(agent, node);
+        }
     }
 
     if (_gd->input->getKey('V'))
@@ -70,7 +85,7 @@ void SimulationManager::tick(GameData* _gd)
 }
 
 
-void SimulationManager::draw(DrawData* _dd)
+void Simulation::draw(DrawData* _dd)
 {
     auto* device = _dd->renderer->getDevice();
     auto* context = _dd->renderer->getDeviceContext();
@@ -103,7 +118,7 @@ void SimulationManager::draw(DrawData* _dd)
 }
 
 
-void SimulationManager::createConstantBuffers(Renderer* _renderer)
+void Simulation::createConstantBuffers(Renderer* _renderer)
 {
     auto device = _renderer->getDevice();
 
@@ -129,7 +144,7 @@ void SimulationManager::createConstantBuffers(Renderer* _renderer)
 }
 
 
-void SimulationManager::createScene(Renderer* _renderer)
+void Simulation::createScene(Renderer* _renderer)
 {
     // Load the level from file.
     level = std::make_unique<Level>(FileIO::loadLevel("level1.txt"));
@@ -161,6 +176,9 @@ void SimulationManager::createScene(Renderer* _renderer)
             node.setNodeIndex(index);
             node.setPos(col, row, 0);
             node.setWalkable(level->data[index] != 'W');
+
+            node.setAdjacentNeighbours(evaluateNodeNeighbours(index));
+            node.setAllNeighbours(evaluateNodeNeighbours(index, true));
         }
     }
 
@@ -172,7 +190,7 @@ void SimulationManager::createScene(Renderer* _renderer)
 }
 
 
-void SimulationManager::configureAgentInstanceBuffer()
+void Simulation::configureAgentInstanceBuffer()
 {
     ZeroMemory(&agent_inst_buff_desc, sizeof(agent_inst_buff_desc));
     agent_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -186,7 +204,7 @@ void SimulationManager::configureAgentInstanceBuffer()
 }
 
 
-void SimulationManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
+void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
     // Update current world.
     cb_cpu->obj_world = DirectX::XMMatrixTranspose(agent_world);
@@ -206,7 +224,7 @@ void SimulationManager::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _
 }
 
 
-void SimulationManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context)
+void Simulation::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
     // Update current world.
     cb_cpu->obj_world = DirectX::XMMatrixTranspose(nav_world);
@@ -226,7 +244,7 @@ void SimulationManager::drawScene(ID3D11Device* _device, ID3D11DeviceContext* _c
 }
 
 
-void SimulationManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
+void Simulation::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11DeviceContext* _context)
 {
     D3D11_MAPPED_SUBRESOURCE mapped_resource;
     ZeroMemory(&mapped_resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -239,7 +257,7 @@ void SimulationManager::updateConstantBuffer(ID3D11Device* /*_device*/, ID3D11De
 }
 
 
-void SimulationManager::updateAgentInstanceBuffer()
+void Simulation::updateAgentInstanceBuffer()
 {
     HRESULT hr = { 0 };
 
@@ -254,7 +272,7 @@ void SimulationManager::updateAgentInstanceBuffer()
 }
 
 
-void SimulationManager::updateSwarmDestination()
+void Simulation::updateSwarmDestination()
 {
     auto& pos = cursor->getPos();
     if (!posWithinSimBounds(pos))
@@ -279,7 +297,7 @@ void SimulationManager::updateSwarmDestination()
 }
 
 
-bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
+bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 {
     float half_scale = grid_scale * 0.5f;
 
@@ -293,9 +311,8 @@ bool SimulationManager::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 }
 
 
-int SimulationManager::posToTileIndex(const DirectX::XMFLOAT3& _pos)
+int Simulation::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 {
-    // Calculate where the click was.
     float half_scale = grid_scale * 0.5f;
 
     auto offsetx = _pos.x + half_scale;
@@ -309,7 +326,7 @@ int SimulationManager::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 }
 
 
-void SimulationManager::generateDijkstrasDistances(const int _goal_index)
+void Simulation::generateDijkstrasDistances(const int _goal_index)
 {
     int UNVISITED = 99999;
     int num_walkable = 0;
@@ -335,7 +352,7 @@ void SimulationManager::generateDijkstrasDistances(const int _goal_index)
     for (int i = 0; i < num_walkable; ++i)
     {
         auto* node = to_visit[i];
-        auto neighbours = getNodeNeighbours(node->getNodeIndex());
+        auto neighbours = node->getAdjacentNeighbours();
 
         for (auto* neighbour : neighbours)
         {
@@ -352,7 +369,7 @@ void SimulationManager::generateDijkstrasDistances(const int _goal_index)
 }
 
 
-void SimulationManager::generateFlowField()
+void Simulation::generateFlowField()
 {
     for (auto& node : nav_nodes)
     {
@@ -360,7 +377,7 @@ void SimulationManager::generateFlowField()
         if (!node.isWalkable())
             continue;
 
-        std::vector<NavNode*> neighbours = getNodeNeighbours(node.getNodeIndex(), true);
+        auto neighbours = node.getAllNeighbours();
 
         NavNode* progress_node = nullptr;
         int progress = 0;
@@ -386,11 +403,11 @@ void SimulationManager::generateFlowField()
 }
 
 
-std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_tile,
+std::vector<NavNode*> Simulation::evaluateNodeNeighbours(const int _center_tile,
     const bool _diagonals)
 {
     std::vector<NavNode*> neighbours;
-    neighbours.reserve(8);
+    neighbours.reserve(_diagonals ? 8 : 4);
 
     auto coords = JHelper::calculateCoords(_center_tile, level->width);
 
@@ -418,7 +435,7 @@ std::vector<NavNode*> SimulationManager::getNodeNeighbours(const int _center_til
 }
 
 
-void SimulationManager::spawnAgent()
+void Simulation::spawnAgent()
 {
     auto& pos = cursor->getPos();
     if (!posWithinSimBounds(pos))
@@ -437,4 +454,13 @@ void SimulationManager::spawnAgent()
     std::cout << "Agent spawned, num agents: " << agents.size() << std::endl;;
 
     configureAgentInstanceBuffer();
+}
+
+
+void Simulation::shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node)
+{
+    DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(_agent.getPos(), _node.getWorldPos());
+    diff = DirectX::Float3Normalized(diff);
+
+    _agent.adjustPos(diff);
 }

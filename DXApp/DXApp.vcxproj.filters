@@ -56,9 +56,6 @@
     <ClCompile Include="..\src\NavNode.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SimulationManager.cpp">
-      <Filter>Managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\FileIO.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -76,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="..\src\JHelper.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Simulation.cpp">
+      <Filter>Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,9 +139,6 @@
     <ClInclude Include="..\src\NavNode.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SimulationManager.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Level.h">
       <Filter>Assets</Filter>
     </ClInclude>
@@ -159,6 +156,9 @@
     </ClInclude>
     <ClInclude Include="..\src\JHelper.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Simulation.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

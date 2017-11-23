@@ -31,7 +31,7 @@ private:
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<InputHandler> input_handler;
     std::unique_ptr<VBModelFactory> vbmf;
-    std::unique_ptr<SimulationManager> simulation_manager;
+    std::unique_ptr<Simulation> simulation;
 
     // Data.
     GameData game_data;

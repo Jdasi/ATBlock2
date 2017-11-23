@@ -32,7 +32,7 @@
     <ClCompile Include="..\src\SimpleTimer.cpp" />
     <ClCompile Include="..\src\Square.cpp" />
     <ClCompile Include="..\src\SwarmAgent.cpp" />
-    <ClCompile Include="..\src\SimulationManager.cpp" />
+    <ClCompile Include="..\src\Simulation.cpp" />
     <ClCompile Include="..\src\VBGO.cpp" />
     <ClCompile Include="..\src\VBModel.cpp" />
     <ClCompile Include="..\src\VBModelFactory.cpp" />
@@ -61,7 +61,7 @@
     <ClInclude Include="..\src\SimpleTimer.h" />
     <ClInclude Include="..\src\Square.h" />
     <ClInclude Include="..\src\SwarmAgent.h" />
-    <ClInclude Include="..\src\SimulationManager.h" />
+    <ClInclude Include="..\src\Simulation.h" />
     <ClInclude Include="..\src\VBGO.h" />
     <ClInclude Include="..\src\VBModel.h" />
     <ClInclude Include="..\src\VBModelFactory.h" />

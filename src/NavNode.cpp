@@ -9,6 +9,7 @@ NavNode::NavNode(const float _matrix_scale)
     , node_index(0)
     , matrix_scale(_matrix_scale)
     , distance(0)
+    , world_pos(0, 0, 0)
     , flow_dir(0, 0, 0)
 {
     setWalkable(true);
@@ -21,9 +22,16 @@ const DirectX::XMFLOAT3& NavNode::getPos() const
 }
 
 
+const DirectX::XMFLOAT3& NavNode::getWorldPos() const
+{
+    return world_pos;
+}
+
+
 void NavNode::setPos(const DirectX::XMFLOAT3& _pos)
 {
     pos = _pos;
+    world_pos = DirectX::Float3Mul(_pos, matrix_scale);
 }
 
 
@@ -96,6 +104,30 @@ void NavNode::setFlowDir(const DirectX::XMFLOAT3& _dir)
 void NavNode::setFlowDir(const float _x, const float _y, const float _z)
 {
     setFlowDir(DirectX::XMFLOAT3(_x, _y, _z));
+}
+
+
+const std::vector<NavNode*>& NavNode::getAdjacentNeighbours() const
+{
+    return adjacent_neighbours;
+}
+
+
+void NavNode::setAdjacentNeighbours(const std::vector<NavNode*>& _adjacent_neighbours)
+{
+    adjacent_neighbours = _adjacent_neighbours;
+}
+
+
+const std::vector<NavNode*>& NavNode::getAllNeighbours() const
+{
+    return all_neighbours;
+}
+
+
+void NavNode::setAllNeighbours(const std::vector<NavNode*>& _all_neighbours)
+{
+    all_neighbours = _all_neighbours;
 }
 
 

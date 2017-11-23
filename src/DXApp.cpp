@@ -52,8 +52,7 @@ void DXApp::initObjects()
 {
     input_handler = std::make_unique<InputHandler>();
     vbmf = std::make_unique<VBModelFactory>(renderer.get());
-    simulation_manager = std::make_unique<SimulationManager>(
-        renderer.get(), vbmf.get());
+    simulation = std::make_unique<Simulation>(renderer.get(), vbmf.get());
 
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(),
         0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);
@@ -112,7 +111,7 @@ int DXApp::run()
 void DXApp::tick()
 {
     camera->tick(&game_data);
-    simulation_manager->tick(&game_data);
+    simulation->tick(&game_data);
 
     game_data.camera_pos = camera->getPos();
 
@@ -128,7 +127,7 @@ void DXApp::render()
     renderer->beginFrame();
 
     VBGO::updateConstantBuffers(&draw_data);
-    simulation_manager->draw(&draw_data);
+    simulation->draw(&draw_data);
 
     renderer->endFrame();
 }

@@ -6,9 +6,9 @@
 SwarmAgent::SwarmAgent()
     : pos(0, 0, 0)
     , color(1, 1, 1, 1)
-    , seek_pos(0, 0, 0)
     , velocity(0, 0, 0)
     , acceleration(0, 0, 0)
+    , current_tile_index(0)
     , max_speed(20)
     , max_steer(1)
     , max_speed_sqr(max_speed * max_speed)
@@ -20,7 +20,7 @@ SwarmAgent::SwarmAgent()
 void SwarmAgent::tick(GameData* _gd)
 {
     // Generate forces.
-    applyForce(generateSeekForce());
+    //applyForce(generateSeekForce());
 
     // Apply them.
     move(_gd);
@@ -29,12 +29,6 @@ void SwarmAgent::tick(GameData* _gd)
     acceleration.x = 0;
     acceleration.y = 0;
     acceleration.z = 0;
-}
-
-
-void SwarmAgent::setSeekPos(const DirectX::XMFLOAT3& _pos)
-{
-    seek_pos = _pos;
 }
 
 
@@ -53,6 +47,12 @@ void SwarmAgent::setPos(const DirectX::XMFLOAT3& _pos)
 void SwarmAgent::setPos(const float _x, const float _y, const float _z)
 {
     setPos(DirectX::XMFLOAT3(_x, _y, _z));
+}
+
+
+void SwarmAgent::adjustPos(const DirectX::XMFLOAT3& _adjustment)
+{
+    adjustPos(_adjustment.x, _adjustment.y, _adjustment.z);
 }
 
 
@@ -82,32 +82,30 @@ void SwarmAgent::setColor(const float _r, const float _g, const float _b, const 
 }
 
 
-DirectX::XMFLOAT3 SwarmAgent::generateSeekForce()
+int SwarmAgent::getCurrentTileIndex() const
 {
-    DirectX::XMFLOAT3 desired = DirectX::Float3SubtractBfromA(seek_pos, pos);
-    desired = DirectX::Float3Normalized(desired);
-    desired = DirectX::Float3Mul(desired, max_speed);
+    return current_tile_index;
+}
 
-    DirectX::XMFLOAT3 steer = DirectX::Float3SubtractBfromA(desired, velocity);
-    if (DirectX::Float3MagnitudeSquared(steer) > max_steer_sqr)
+
+void SwarmAgent::setCurrentTileIndex(const int _tile_index)
+{
+    if (current_tile_index != _tile_index)
     {
-        steer = DirectX::Float3Normalized(steer);
-        steer = DirectX::Float3Mul(steer, max_steer);
+        // TODO: inform spatial partioning system of tile change ..
     }
 
-    return steer;
+    current_tile_index = _tile_index;
 }
 
 
-DirectX::XMFLOAT3 SwarmAgent::generateAvoidanceForce()
+void SwarmAgent::applySteer(const DirectX::XMFLOAT3& _force)
 {
-    return DirectX::XMFLOAT3();
-}
+    DirectX::XMFLOAT3 desired = DirectX::Float3Mul(_force, max_speed);
+    DirectX::XMFLOAT3 change = DirectX::Float3SubtractBfromA(desired, velocity);
+    change = DirectX::Float3Mul(change, max_steer / max_speed);
 
-
-void SwarmAgent::applyForce(const DirectX::XMFLOAT3& _force)
-{
-    acceleration = DirectX::Float3Add(acceleration, _force);
+    acceleration = DirectX::Float3Add(acceleration, change);
 }
 
 
