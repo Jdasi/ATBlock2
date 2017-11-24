@@ -27,6 +27,8 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     createConstantBuffers(_renderer);
     createScene(_renderer);
 
+    int debug_index = JHelper::calculateIndex(1, 1, level->width);
+    cursor->setPos(nav_nodes[debug_index].getWorldPos());
     updateSwarmDestination();
 }
 
