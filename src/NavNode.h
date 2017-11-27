@@ -4,6 +4,8 @@
 
 #include "DXMathHelper.h"
 
+class SwarmAgent;
+
 class NavNode
 {
 public:
@@ -37,6 +39,10 @@ public:
 
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
 
+    int getBinCount() const;
+    void addAgentPtr(SwarmAgent* _agent);
+    void removeAgentPtr(SwarmAgent* _agent);
+
 private:
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT4 color;
@@ -51,5 +57,7 @@ private:
 
     std::vector<NavNode*> adjacent_neighbours;
     std::vector<NavNode*> all_neighbours;
+
+    std::vector<SwarmAgent*> agent_bin;
 
 };

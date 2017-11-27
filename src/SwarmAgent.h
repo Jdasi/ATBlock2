@@ -1,13 +1,27 @@
 #pragma once
 
 #include "DXMathHelper.h"
+#include "ListenerSubject.h"
+#include "AgentListener.h"
 
 struct GameData;
 
-class SwarmAgent
+struct AgentInstanceData
+{
+    AgentInstanceData()
+        : pos(0, 0, 0)
+        , color(1, 1, 1, 1)
+    {
+    }
+
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 color;
+};
+
+class SwarmAgent : public ListenerSubject<AgentListener>
 {
 public:
-    SwarmAgent();
+    SwarmAgent(AgentInstanceData& _data);
     ~SwarmAgent() = default;
 
     void tick(GameData* _gd);
@@ -30,9 +44,7 @@ public:
 private:
     void move(GameData* _gd);
 
-    // Variable ordering must match instance shader input layout.
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT4 color;
+    AgentInstanceData& instance_data;
 
     DirectX::XMFLOAT3 velocity;
     DirectX::XMFLOAT3 acceleration;

@@ -3,9 +3,8 @@
 #include "JTime.h"
 
 
-SwarmAgent::SwarmAgent()
-    : pos(0, 0, 0)
-    , color(1, 1, 1, 1)
+SwarmAgent::SwarmAgent(AgentInstanceData& _data)
+    : instance_data(_data)
     , velocity(0, 0, 0)
     , acceleration(0, 0, 0)
     , current_tile_index(0)
@@ -34,13 +33,13 @@ void SwarmAgent::tick(GameData* _gd)
 
 const DirectX::XMFLOAT3& SwarmAgent::getPos() const
 {
-    return pos;
+    return instance_data.pos;
 }
 
 
 void SwarmAgent::setPos(const DirectX::XMFLOAT3& _pos)
 {
-    pos = _pos;
+    instance_data.pos = _pos;
 }
 
 
@@ -58,21 +57,21 @@ void SwarmAgent::adjustPos(const DirectX::XMFLOAT3& _adjustment)
 
 void SwarmAgent::adjustPos(const float _x, const float _y, const float _z)
 {
-    pos.x += _x;
-    pos.y += _y;
-    pos.z += _z;
+    instance_data.pos.x += _x;
+    instance_data.pos.y += _y;
+    instance_data.pos.z += _z;
 }
 
 
 const DirectX::XMFLOAT4& SwarmAgent::getCol() const
 {
-    return color;
+    return instance_data.color;
 }
 
 
 void SwarmAgent::setColor(const DirectX::XMFLOAT4& _color)
 {
-    color = _color;
+    instance_data.color = _color;
 }
 
 
@@ -92,7 +91,10 @@ void SwarmAgent::setCurrentTileIndex(const int _tile_index)
 {
     if (current_tile_index != _tile_index)
     {
-        // TODO: inform spatial partioning system of tile change ..
+        for (auto& listener : listeners)
+        {
+            listener->onTileIndexChanged(this, current_tile_index, _tile_index);
+        }
     }
 
     current_tile_index = _tile_index;
@@ -121,5 +123,5 @@ void SwarmAgent::move(GameData* _gd)
     }
 
     DirectX::XMFLOAT3 step = DirectX::Float3Mul(velocity, JTime::getDeltaTime());
-    pos = DirectX::Float3Add(pos, step);
+    instance_data.pos = DirectX::Float3Add(instance_data.pos, step);
 }

@@ -16,7 +16,7 @@ struct GameData;
 struct DrawData;
 class VBModelFactory;
 
-class Simulation
+class Simulation : public AgentListener
 {
 public:
     Simulation(Renderer* _renderer, VBModelFactory* _vbmf);
@@ -48,6 +48,9 @@ private:
     void spawnAgent();
     void shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node);
 
+    void onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
+        const int _new_index) override;
+
     Renderer* renderer;
     VBModelFactory* vbmf;
 
@@ -60,7 +63,8 @@ private:
     D3D11_BUFFER_DESC agent_inst_buff_desc;
     D3D11_SUBRESOURCE_DATA agent_inst_res_data;
 
-    std::vector<SwarmAgent> agents;
+    std::vector<AgentInstanceData> agent_instance_data; // Stuff given to the GPU to draw agents.
+    std::vector<SwarmAgent> agents; // Fleshed out agent class with behaviour (uses AgentInstanceData).
     DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
 
     std::unique_ptr<VBModel> agent_model;

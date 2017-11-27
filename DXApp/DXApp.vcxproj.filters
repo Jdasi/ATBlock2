@@ -160,6 +160,12 @@
     <ClInclude Include="..\src\Simulation.h">
       <Filter>Managers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ListenerSubject.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\AgentListener.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Shaders\InstancedPixelShader.hlsl">

@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <algorithm>
+
 #include "NavNode.h"
 
 
@@ -13,6 +15,8 @@ NavNode::NavNode(const float _matrix_scale)
     , flow_dir(0, 0, 0)
 {
     setWalkable(true);
+
+    agent_bin.reserve(1000);
 }
 
 
@@ -149,4 +153,26 @@ bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
     }
 
     return false;
+}
+
+
+int NavNode::getBinCount() const
+{
+    return agent_bin.size();
+}
+
+
+void NavNode::addAgentPtr(SwarmAgent* _agent)
+{
+    agent_bin.push_back(_agent);
+}
+
+
+void NavNode::removeAgentPtr(SwarmAgent* _agent)
+{
+    agent_bin.erase(std::remove_if(
+        agent_bin.begin(),
+        agent_bin.end(),
+        [_agent](SwarmAgent* _a) { return _a == _agent; }),
+        agent_bin.end());
 }

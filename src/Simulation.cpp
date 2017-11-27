@@ -16,6 +16,9 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     , vbmf(_vbmf)
     , grid_scale(10)
 {
+    agent_instance_data.reserve(100000);
+    agents.reserve(100000);
+
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
 
     cursor = std::make_unique<VBGO>(vbmf->createSquare());
@@ -73,13 +76,13 @@ void Simulation::tick(GameData* _gd)
         }
     }
 
-    if (_gd->input->getKey('V'))
+    if (_gd->input->getKeyDown('V'))
         spawnAgent();
 
     if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
 
-    if (agents.size() > 0)
+    if (agent_instance_data.size() > 0)
     {
         // Update the instance buffer after behaviour tick ..
         updateAgentInstanceBuffer();
@@ -104,7 +107,7 @@ void Simulation::draw(DrawData* _dd)
     cb_cpu->proj = DirectX::XMMatrixTranspose(_dd->camera->getProjMat());
     // END CONSTANT BUFFER STUFF -----------------------------------------------
 
-    if (agents.size() > 0)
+    if (agent_instance_data.size() > 0)
     {
         _dd->renderer->setRenderStyle(Renderer::RenderStyle::SOLID);
         drawAgents(device, context);
@@ -196,13 +199,13 @@ void Simulation::configureAgentInstanceBuffer()
 {
     ZeroMemory(&agent_inst_buff_desc, sizeof(agent_inst_buff_desc));
     agent_inst_buff_desc.Usage = D3D11_USAGE_DEFAULT;
-    agent_inst_buff_desc.ByteWidth = sizeof(SwarmAgent) * agents.size();
+    agent_inst_buff_desc.ByteWidth = sizeof(AgentInstanceData) * agent_instance_data.size();
     agent_inst_buff_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     agent_inst_buff_desc.CPUAccessFlags = 0;
     agent_inst_buff_desc.MiscFlags = 0;
 
     ZeroMemory(&agent_inst_res_data, sizeof(agent_inst_res_data));
-    agent_inst_res_data.pSysMem = &agents[0];
+    agent_inst_res_data.pSysMem = &agent_instance_data[0];
 }
 
 
@@ -213,7 +216,7 @@ void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context
     updateConstantBuffer(_device, _context);
 
     // Bind vertex buffer.
-    UINT strides[2] = { sizeof(Vertex), sizeof(SwarmAgent) };
+    UINT strides[2] = { sizeof(Vertex), sizeof(AgentInstanceData) };
     UINT offsets[2] = { 0, 0 };
 
     ID3D11Buffer* vert_inst_buffers[2] = { *agent_model->getVertexBuffer(), agent_inst_buff };
@@ -222,7 +225,7 @@ void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context
     _context->IASetIndexBuffer(agent_model->getIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
     _context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    _context->DrawIndexedInstanced(agent_model->getNumIndices(), agents.size(), 0, 0, 0);
+    _context->DrawIndexedInstanced(agent_model->getNumIndices(), agent_instance_data.size(), 0, 0, 0);
 }
 
 
@@ -447,11 +450,13 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
-    agents.push_back(SwarmAgent());
+    agent_instance_data.push_back(AgentInstanceData());
+    agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
 
     auto& agent = agents[agents.size() - 1];
     agent.setPos(pos.x, pos.y, 0);
     agent.setColor(1, 0, 0, 1);
+    agent.attachListener(this);
 
     std::cout << "Agent spawned, num agents: " << agents.size() << std::endl;;
 
@@ -465,4 +470,15 @@ void Simulation::shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node)
     diff = DirectX::Float3Normalized(diff);
 
     _agent.adjustPos(diff);
+}
+
+
+void Simulation::onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
+    const int _new_index)
+{
+    auto& prev_node = nav_nodes[_prev_index];
+    auto& new_node = nav_nodes[_new_index];
+
+    prev_node.removeAgentPtr(_agent);
+    new_node.addAgentPtr(_agent);
 }
