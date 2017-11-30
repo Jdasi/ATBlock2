@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "NavNode.h"
+#include "Constants.h"
 
 
 NavNode::NavNode(const float _matrix_scale)
@@ -16,7 +17,7 @@ NavNode::NavNode(const float _matrix_scale)
 {
     setWalkable(true);
 
-    agent_bin.reserve(1000);
+    agent_bin.reserve(MAX_AGENTS);
 }
 
 
@@ -159,6 +160,12 @@ bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
 int NavNode::getBinCount() const
 {
     return agent_bin.size();
+}
+
+
+std::vector<SwarmAgent*>& NavNode::getAgentBin()
+{
+    return agent_bin;
 }
 
 

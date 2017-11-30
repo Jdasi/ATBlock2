@@ -1,6 +1,9 @@
 #include "SwarmAgent.h"
 #include "GameData.h"
 #include "JTime.h"
+#include "Constants.h"
+
+#include <iostream>
 
 
 SwarmAgent::SwarmAgent(AgentInstanceData& _data)
@@ -18,16 +21,39 @@ SwarmAgent::SwarmAgent(AgentInstanceData& _data)
 
 void SwarmAgent::tick(GameData* _gd)
 {
-    // Generate forces.
-    //applyForce(generateSeekForce());
-
-    // Apply them.
     move(_gd);
 
     // Reset for next tick.
     acceleration.x = 0;
     acceleration.y = 0;
     acceleration.z = 0;
+}
+
+
+void SwarmAgent::steerFromNeighbourAgents(std::vector<SwarmAgent*> _neighbours)
+{
+    DirectX::XMFLOAT3 steer { 0, 0, 0 };
+
+    for (auto* neighbour : _neighbours)
+    {
+        // Don't try to steer away from self.
+        if (neighbour == this)
+            continue;
+
+        auto& neighbour_pos = neighbour->getPos();
+        float distance_sqr = DirectX::Float3DistanceSquared(instance_data.pos, neighbour_pos);
+
+        if (distance_sqr == 0 || distance_sqr > DESIRED_SEPARATION_SQR)
+            continue;
+
+        DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(instance_data.pos, neighbour_pos);
+        diff = DirectX::Float3Normalized(diff);
+        diff = DirectX::Float3Div(diff, distance_sqr);
+
+        steer = DirectX::Float3Add(steer, diff);
+    }
+
+    applySteer(steer);
 }
 
 

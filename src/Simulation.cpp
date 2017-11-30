@@ -9,6 +9,7 @@
 #include "JTime.h"
 #include "JHelper.h"
 #include "FileIO.h"
+#include "Constants.h"
 
 
 Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
@@ -16,8 +17,8 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     , vbmf(_vbmf)
     , grid_scale(10)
 {
-    agent_instance_data.reserve(100000);
-    agents.reserve(100000);
+    agent_instance_data.reserve(MAX_AGENTS);
+    agents.reserve(MAX_AGENTS);
 
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
 
@@ -30,6 +31,7 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     createConstantBuffers(_renderer);
     createScene(_renderer);
 
+    // Set initial waypoint to grid node 1, 1.
     int debug_index = JHelper::calculateIndex(1, 1, level->width);
     cursor->setPos(nav_nodes[debug_index].getWorldPos());
     updateSwarmDestination();
@@ -74,9 +76,11 @@ void Simulation::tick(GameData* _gd)
         {
             shuntAgentFromNode(agent, node);
         }
+
+        agent.steerFromNeighbourAgents(node.getAgentBin());
     }
 
-    if (_gd->input->getKeyDown('V'))
+    if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
         spawnAgent();
 
     if (_gd->input->getKeyDown('B'))
@@ -450,15 +454,18 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
-    agent_instance_data.push_back(AgentInstanceData());
-    agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
+    for (int i = 0; i < AGENTS_PER_SPAWN; ++i)
+    {
+        agent_instance_data.push_back(AgentInstanceData());
+        agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
 
-    auto& agent = agents[agents.size() - 1];
-    agent.setPos(pos.x, pos.y, 0);
-    agent.setColor(1, 0, 0, 1);
-    agent.attachListener(this);
+        auto& agent = agents[agents.size() - 1];
+        agent.setPos(pos.x, pos.y, 0);
+        agent.setColor(1, 0, 0, 1);
+        agent.attachListener(this);
+    }
 
-    std::cout << "Agent spawned, num agents: " << agents.size() << std::endl;;
+    std::cout << "Agents spawned, num agents: " << agents.size() << std::endl;
 
     configureAgentInstanceBuffer();
 }

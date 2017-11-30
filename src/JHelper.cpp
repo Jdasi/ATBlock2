@@ -25,3 +25,22 @@ bool JHelper::validIndex(const int _index, const int _array_size)
 
     return true;
 }
+
+
+//https://stackoverflow.com/questions/21010586/normalizing-spatial-vectors-without-square-root
+//https://en.wikipedia.org/wiki/Fast_inverse_square_root
+float JHelper::fisqrt(float _n)
+{
+    long i;
+    float x2, y;
+    const float threehalfs = 1.5F;
+
+    x2  = _n * 0.5f;
+    y   = _n;
+    i   = *(long *)&y;
+    i   = 0x5f3759df - (i >> 1);
+    y   = *(float *)&i;
+    y   = y * (threehalfs - (x2 * y * y));
+
+    return y;
+}

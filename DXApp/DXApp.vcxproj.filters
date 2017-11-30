@@ -166,6 +166,9 @@
     <ClInclude Include="..\src\AgentListener.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Constants.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Shaders\InstancedPixelShader.hlsl">

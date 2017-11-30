@@ -1,4 +1,5 @@
 #include "DXMathHelper.h"
+#include "JHelper.h"
 
 
 DirectX::XMFLOAT3 DirectX::Float3Add(const XMFLOAT3& _a, const XMFLOAT3& _b)
@@ -37,15 +38,28 @@ DirectX::XMFLOAT3 DirectX::Float3Mul(const XMFLOAT3& _a, const float _mul)
 }
 
 
+DirectX::XMFLOAT3 DirectX::Float3Div(const XMFLOAT3& _a, const float _div)
+{
+    DirectX::XMFLOAT3 f;
+
+    f.x = _a.x / _div;
+    f.y = _a.y / _div;
+    f.z = _a.z / _div;
+
+    return f;
+}
+
+
 DirectX::XMFLOAT3 DirectX::Float3Normalized(const XMFLOAT3& _a)
 {
     DirectX::XMFLOAT3 f;
 
-    float mag = 1 / Float3Magnitude(_a);
+    float mag_sqr = Float3MagnitudeSquared(_a);
+    float inv_sqrt = JHelper::fisqrt(mag_sqr);
 
-    f.x = _a.x * mag;
-    f.y = _a.y * mag;
-    f.z = _a.z * mag;
+    f.x = _a.x * inv_sqrt;
+    f.y = _a.y * inv_sqrt;
+    f.z = _a.z * inv_sqrt;
 
     return f;
 }
