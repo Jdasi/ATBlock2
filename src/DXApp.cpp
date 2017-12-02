@@ -67,6 +67,7 @@ void DXApp::initObjects()
     draw_data.renderer = renderer.get();
     draw_data.camera = camera.get();
 
+    // Initialise VBGO static data.
     VBGO::init(renderer.get());
 }
 
@@ -96,7 +97,7 @@ int DXApp::run()
             tick();
             render();
 
-            // Needs to be done last to properly record prev key states.
+            // Needs to be done last to record prev key states.
             input_handler->lateTick();
         }
 

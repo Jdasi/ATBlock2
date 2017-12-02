@@ -21,18 +21,21 @@ NavNode::NavNode(const float _matrix_scale)
 }
 
 
+// Gets the node's unscaled position (use getWorldPos for its actual world position).
 const DirectX::XMFLOAT3& NavNode::getPos() const
 {
     return pos;
 }
 
 
+// Gets the node's scaled position. This is where the node is in world space.
 const DirectX::XMFLOAT3& NavNode::getWorldPos() const
 {
     return world_pos;
 }
 
 
+// Sets the node's unscaled position. The world position is automatically recalulcated.
 void NavNode::setPos(const DirectX::XMFLOAT3& _pos)
 {
     pos = _pos;
@@ -40,6 +43,7 @@ void NavNode::setPos(const DirectX::XMFLOAT3& _pos)
 }
 
 
+// Sets the node's unscaled position. The world position is automatically recalulcated.
 void NavNode::setPos(const float _x, const float _y, const float _z)
 {
     setPos(DirectX::XMFLOAT3(_x, _y, _z));

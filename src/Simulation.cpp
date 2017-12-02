@@ -51,6 +51,7 @@ void Simulation::tick(GameData* _gd)
     DirectX::XMFLOAT3 cam_pos = _gd->camera_pos;
     cursor->setPos(cam_pos.x, cam_pos.y, -1);
 
+    // Debug visualisation stuff ..
     cursor->tick(_gd);
     waypoint_indicator->tick(_gd);
     waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
@@ -86,9 +87,9 @@ void Simulation::tick(GameData* _gd)
     if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
 
+    // Update instance buffer after behaviour tick ..
     if (agent_instance_data.size() > 0)
     {
-        // Update the instance buffer after behaviour tick ..
         updateAgentInstanceBuffer();
     }
 }
@@ -287,22 +288,23 @@ void Simulation::updateSwarmDestination()
     if (!posWithinSimBounds(pos))
         return;
 
-    int index = posToTileIndex(pos);
-    if (!nav_nodes[index].isWalkable())
+    int goal_index = posToTileIndex(pos);
+    if (!nav_nodes[goal_index].isWalkable())
         return;
 
-    generateDijkstrasDistances(index);
+    generateDijkstrasDistances(goal_index);
     generateFlowField();
 
     // Put indicator in the center of the tile for visual reference.
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
-    DirectX::XMINT2 coords = JHelper::calculateCoords(index, level->width);
+    DirectX::XMINT2 coords = JHelper::calculateCoords(goal_index, level->width);
     snap_pos.x = coords.x * grid_scale;
     snap_pos.y = coords.y * grid_scale;
     waypoint_indicator->setPos(snap_pos);
 
-    std::cout << "Math index: " << index << " -- Tile index: "
-              << nav_nodes[index].getNodeIndex() << std::endl;
+    // Debug.
+    std::cout << "Math index: " << goal_index << " -- Tile index: "
+              << nav_nodes[goal_index].getNodeIndex() << std::endl;
 }
 
 
@@ -320,6 +322,7 @@ bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 }
 
 
+// This does not necessarily return a safe array index.
 int Simulation::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 {
     float half_scale = grid_scale * 0.5f;
@@ -361,7 +364,7 @@ void Simulation::generateDijkstrasDistances(const int _goal_index)
     for (int i = 0; i < num_walkable; ++i)
     {
         auto* node = to_visit[i];
-        auto neighbours = node->getAdjacentNeighbours();
+        auto& neighbours = node->getAdjacentNeighbours();
 
         for (auto* neighbour : neighbours)
         {
@@ -386,12 +389,12 @@ void Simulation::generateFlowField()
         if (!node.isWalkable())
             continue;
 
-        auto neighbours = node.getAllNeighbours();
+        auto& neighbours = node.getAllNeighbours();
 
         NavNode* progress_node = nullptr;
         int progress = 0;
 
-        for (NavNode* neighbour : neighbours)
+        for (auto* neighbour : neighbours)
         {
             int distance = neighbour->getDistance() - node.getDistance();
 
@@ -405,8 +408,7 @@ void Simulation::generateFlowField()
         if (progress_node == nullptr)
             continue;
 
-        DirectX::XMFLOAT3 dir = DirectX::Float3DirectionAtoB(
-            node.getPos(), progress_node->getPos());
+        DirectX::XMFLOAT3 dir = DirectX::Float3DirectionAtoB(node.getPos(), progress_node->getPos());
         node.setFlowDir(dir);
     }
 }

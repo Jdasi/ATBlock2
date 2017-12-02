@@ -65,7 +65,7 @@ private:
 
     std::vector<AgentInstanceData> agent_instance_data; // Stuff given to the GPU to draw agents.
     std::vector<SwarmAgent> agents; // Fleshed out agent class with behaviour (uses AgentInstanceData).
-    DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity(); // All agents use this world matrix.
 
     std::unique_ptr<VBModel> agent_model;
 
