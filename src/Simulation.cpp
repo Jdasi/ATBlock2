@@ -16,6 +16,7 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
     , grid_scale(10)
+    , paused(false)
 {
     agent_instance_data.reserve(MAX_AGENTS);
     agents.reserve(MAX_AGENTS);
@@ -54,38 +55,16 @@ void Simulation::tick(GameData* _gd)
     // Debug visualisation stuff ..
     cursor->tick(_gd);
     waypoint_indicator->tick(_gd);
-    waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
-    waypoint_indicator->setScale(2 + cos(5 * JTime::getTime()));
 
-    // Perform all swarm behaviour ..
-    for (SwarmAgent& agent : agents)
+    handleInput(_gd);
+
+    if (!paused)
     {
-        agent.tick(_gd);
+        waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
+        waypoint_indicator->setScale(2 + cos(5 * JTime::getTime()));
 
-        int index = posToTileIndex(agent.getPos());
-        if (!JHelper::validIndex(index, nav_nodes.size()))
-            continue;
-
-        auto& node = nav_nodes[index];
-        agent.setCurrentTileIndex(index);
-
-        if (node.isWalkable())
-        {
-            agent.applySteer(node.getFlowDir());
-        }
-        else
-        {
-            shuntAgentFromNode(agent, node);
-        }
-
-        agent.steerFromNeighbourAgents(node.getAgentBin());
+        handleAgentBehaviour(_gd);
     }
-
-    if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
-        spawnAgent();
-
-    if (_gd->input->getKeyDown('B'))
-        updateSwarmDestination();
 
     // Update instance buffer after behaviour tick ..
     if (agent_instance_data.size() > 0)
@@ -211,6 +190,47 @@ void Simulation::configureAgentInstanceBuffer()
 
     ZeroMemory(&agent_inst_res_data, sizeof(agent_inst_res_data));
     agent_inst_res_data.pSysMem = &agent_instance_data[0];
+}
+
+
+void Simulation::handleInput(GameData* _gd)
+{
+    if (_gd->input->getActionDown(GameAction::PAUSE))
+        paused = !paused;
+
+    if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
+        spawnAgent();
+
+    if (_gd->input->getKeyDown('B'))
+        updateSwarmDestination();
+}
+
+
+void Simulation::handleAgentBehaviour(GameData* _gd)
+{
+    // Perform all swarm behaviour ..
+    for (SwarmAgent& agent : agents)
+    {
+        agent.tick(_gd);
+
+        int index = posToTileIndex(agent.getPos());
+        if (!JHelper::validIndex(index, nav_nodes.size()))
+            continue;
+
+        auto& node = nav_nodes[index];
+        agent.setCurrentTileIndex(index);
+
+        if (node.isWalkable())
+        {
+            agent.applySteer(node.getFlowDir());
+        }
+        else
+        {
+            shuntAgentFromNode(agent, node);
+        }
+
+        agent.steerFromNeighbourAgents(node.getAgentBin());
+    }
 }
 
 

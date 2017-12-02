@@ -30,6 +30,9 @@ private:
     void createScene(Renderer* _renderer);
     void configureAgentInstanceBuffer();
 
+    void handleInput(GameData* _gd);
+    void handleAgentBehaviour(GameData* _gd);
+
     void drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context);
     void drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context);
 
@@ -81,5 +84,7 @@ private:
     // Helper stuff.
     std::unique_ptr<VBGO> cursor;
     std::unique_ptr<VBGO> waypoint_indicator;
+
+    bool paused;
 
 };

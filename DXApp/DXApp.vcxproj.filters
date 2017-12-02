@@ -75,7 +75,7 @@
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Simulation.cpp">
-      <Filter>Managers</Filter>
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,9 +157,6 @@
     <ClInclude Include="..\src\JHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Simulation.h">
-      <Filter>Managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ListenerSubject.h">
       <Filter>Utility</Filter>
     </ClInclude>
@@ -167,6 +164,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Constants.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Simulation.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
