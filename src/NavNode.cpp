@@ -167,7 +167,7 @@ int NavNode::getBinCount() const
 }
 
 
-std::vector<SwarmAgent*>& NavNode::getAgentBin()
+const std::vector<SwarmAgent*>& NavNode::getAgentBin() const
 {
     return agent_bin;
 }

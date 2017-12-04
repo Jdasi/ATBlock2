@@ -40,7 +40,7 @@ public:
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
 
     int getBinCount() const;
-    std::vector<SwarmAgent*>& getAgentBin();
+    const std::vector<SwarmAgent*>& getAgentBin() const;
     void addAgentPtr(SwarmAgent* _agent);
     void removeAgentPtr(SwarmAgent* _agent);
 

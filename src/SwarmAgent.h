@@ -26,7 +26,7 @@ public:
 
     void tick(GameData* _gd);
 
-    void steerFromNeighbourAgents(std::vector<SwarmAgent*> _neighbours);
+    void steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neighbours);
     void applySteer(const DirectX::XMFLOAT3& _force);
 
     const DirectX::XMFLOAT3& getPos() const;

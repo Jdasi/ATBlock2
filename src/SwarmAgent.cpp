@@ -24,7 +24,7 @@ void SwarmAgent::tick(GameData* _gd)
 }
 
 
-void SwarmAgent::steerFromNeighbourAgents(std::vector<SwarmAgent*> _neighbours)
+void SwarmAgent::steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neighbours)
 {
     DirectX::XMFLOAT3 steer { 0, 0, 0 };
 
