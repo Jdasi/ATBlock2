@@ -52,10 +52,4 @@ private:
 
     int current_tile_index;
 
-    // Settings.
-    float max_speed;
-    float max_steer;
-    float max_speed_sqr; // Squared value.
-    float max_steer_sqr; // Squared value.
-
 };

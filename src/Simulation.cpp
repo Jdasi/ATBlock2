@@ -225,7 +225,7 @@ void Simulation::handleAgentBehaviour(GameData* _gd)
         }
         else
         {
-            shuntAgentFromNode(agent, node);
+            steerAgentFromNode(agent, node);
         }
 
         agent.steerFromNeighbourAgents(node.getAgentBin());
@@ -503,12 +503,12 @@ void Simulation::spawnAgent()
 }
 
 
-void Simulation::shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node)
+void Simulation::steerAgentFromNode(SwarmAgent& _agent, NavNode& _node)
 {
     DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(_agent.getPos(), _node.getWorldPos());
-    diff = DirectX::Float3Normalized(diff);
+    diff = DirectX::Float3Mul(diff, 100); // Really aggressive repelling force.
 
-    _agent.adjustPos(diff);
+    _agent.applySteer(diff);
 }
 
 

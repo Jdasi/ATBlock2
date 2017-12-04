@@ -3,18 +3,12 @@
 #include "JTime.h"
 #include "Constants.h"
 
-#include <iostream>
-
 
 SwarmAgent::SwarmAgent(AgentInstanceData& _data)
     : instance_data(_data)
     , velocity(0, 0, 0)
     , acceleration(0, 0, 0)
     , current_tile_index(0)
-    , max_speed(20)
-    , max_steer(1)
-    , max_speed_sqr(max_speed * max_speed)
-    , max_steer_sqr(max_steer * max_steer)
 {
 }
 
@@ -43,7 +37,7 @@ void SwarmAgent::steerFromNeighbourAgents(std::vector<SwarmAgent*> _neighbours)
         auto& neighbour_pos = neighbour->getPos();
         float distance_sqr = DirectX::Float3DistanceSquared(instance_data.pos, neighbour_pos);
 
-        if (distance_sqr > DESIRED_SEPARATION_SQR)
+        if (distance_sqr > AGENT_DESIRED_SEPARATION_SQR)
             continue;
 
         if (distance_sqr == 0)
@@ -140,9 +134,9 @@ void SwarmAgent::setCurrentTileIndex(const int _tile_index)
 
 void SwarmAgent::applySteer(const DirectX::XMFLOAT3& _force)
 {
-    DirectX::XMFLOAT3 desired = DirectX::Float3Mul(_force, max_speed);
+    DirectX::XMFLOAT3 desired = DirectX::Float3Mul(_force, AGENT_MAX_SPEED);
     DirectX::XMFLOAT3 change = DirectX::Float3SubtractBfromA(desired, velocity);
-    change = DirectX::Float3Mul(change, max_steer / max_speed);
+    change = DirectX::Float3Mul(change, AGENT_MAX_STEER / AGENT_MAX_SPEED);
 
     acceleration = DirectX::Float3Add(acceleration, change);
 }
@@ -153,10 +147,10 @@ void SwarmAgent::move(GameData* _gd)
     velocity = DirectX::Float3Add(velocity, acceleration);
 
     // Limit speed.
-    if (DirectX::Float3MagnitudeSquared(velocity) > max_speed_sqr)
+    if (DirectX::Float3MagnitudeSquared(velocity) > AGENT_MAX_SPEED_SQR)
     {
         velocity = DirectX::Float3Normalized(velocity);
-        velocity = DirectX::Float3Mul(velocity, max_speed);
+        velocity = DirectX::Float3Mul(velocity, AGENT_MAX_SPEED);
     }
 
     DirectX::XMFLOAT3 step = DirectX::Float3Mul(velocity, JTime::getDeltaTime());

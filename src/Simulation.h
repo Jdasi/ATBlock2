@@ -49,7 +49,7 @@ private:
         const bool _diagonals = false);
 
     void spawnAgent();
-    void shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node);
+    void steerAgentFromNode(SwarmAgent& _agent, NavNode& _node);
 
     void onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
         const int _new_index) override;
