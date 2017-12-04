@@ -6,7 +6,7 @@
 #include "Constants.h"
 
 
-NavNode::NavNode(const float _matrix_scale)
+NavNode::NavNode(const int _matrix_scale)
     : pos(0, 0, 0)
     , color(0, 0, 0, 1)
     , node_index(0)
@@ -142,7 +142,7 @@ void NavNode::setAllNeighbours(const std::vector<NavNode*>& _all_neighbours)
 
 bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
 {
-    float half_scale = matrix_scale / 2;
+    float half_scale = static_cast<float>(matrix_scale) / 2;
 
     float left = (pos.x * matrix_scale) - half_scale;
     float right = left + matrix_scale;

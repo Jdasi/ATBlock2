@@ -43,14 +43,25 @@ void SwarmAgent::steerFromNeighbourAgents(std::vector<SwarmAgent*> _neighbours)
         auto& neighbour_pos = neighbour->getPos();
         float distance_sqr = DirectX::Float3DistanceSquared(instance_data.pos, neighbour_pos);
 
-        if (distance_sqr == 0 || distance_sqr > DESIRED_SEPARATION_SQR)
+        if (distance_sqr > DESIRED_SEPARATION_SQR)
             continue;
 
-        DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(instance_data.pos, neighbour_pos);
-        diff = DirectX::Float3Normalized(diff);
-        diff = DirectX::Float3Div(diff, distance_sqr);
+        if (distance_sqr == 0)
+        {
+            // Prevent agents occupying the same space.
+            float rand_x = static_cast<float>(rand() % 1) - 0.5f;
+            float rand_y = static_cast<float>(rand() % 1) - 0.5f;
 
-        steer = DirectX::Float3Add(steer, diff);
+            steer = DirectX::XMFLOAT3(rand_x, rand_y, 0);
+        }
+        else
+        {
+            DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(instance_data.pos, neighbour_pos);
+            diff = DirectX::Float3Normalized(diff);
+            diff = DirectX::Float3Div(diff, distance_sqr);
+
+            steer = DirectX::Float3Add(steer, diff);
+        }
     }
 
     applySteer(steer);

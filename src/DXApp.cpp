@@ -14,6 +14,7 @@ DXApp::DXApp(HINSTANCE _hinstance)
     , window(nullptr)
     , renderer(nullptr)
 {
+    srand(static_cast<unsigned int>(time(0)));
 }
 
 

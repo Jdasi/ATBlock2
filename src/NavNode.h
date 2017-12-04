@@ -9,7 +9,7 @@ class SwarmAgent;
 class NavNode
 {
 public:
-    NavNode(const float _matrix_scale);
+    NavNode(const int _matrix_scale);
     ~NavNode() = default;
 
     const DirectX::XMFLOAT3& getPos() const;
@@ -49,7 +49,7 @@ private:
     DirectX::XMFLOAT4 color;
 
     int node_index;
-    float matrix_scale;
+    int matrix_scale;
     bool walkable;
     int distance;
 

@@ -15,7 +15,7 @@
 Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
-    , grid_scale(10)
+    , grid_scale(5)
     , paused(false)
 {
     agent_instance_data.reserve(MAX_AGENTS);
@@ -136,7 +136,7 @@ void Simulation::createConstantBuffers(Renderer* _renderer)
 void Simulation::createScene(Renderer* _renderer)
 {
     // Load the level from file.
-    level = std::make_unique<Level>(FileIO::loadLevel("level1.txt"));
+    level = std::make_unique<Level>(FileIO::loadLevel("level2.txt"));
 
     // Create the grid tiles (aka Navigation Nodes).
     int grid_size = level->width * level->height;
@@ -163,7 +163,7 @@ void Simulation::createScene(Renderer* _renderer)
             auto& node = nav_nodes[index];
 
             node.setNodeIndex(index);
-            node.setPos(col, row, 0);
+            node.setPos(static_cast<float>(col), static_cast<float>(row), 0);
             node.setWalkable(level->data[index] != 'W');
 
             node.setAdjacentNeighbours(evaluateNodeNeighbours(index));
@@ -174,7 +174,8 @@ void Simulation::createScene(Renderer* _renderer)
     HRESULT hr = renderer->getDevice()->CreateBuffer(&scene_inst_buff_desc,
         &scene_inst_res_data, &scene_inst_buff);
 
-    DirectX::XMMATRIX scale_mat = DirectX::XMMatrixScaling(grid_scale, grid_scale, 1);
+    float grid_scale_f = static_cast<float>(grid_scale);
+    DirectX::XMMATRIX scale_mat = DirectX::XMMatrixScaling(grid_scale_f, grid_scale_f, 1);
     nav_world = nav_world * scale_mat;
 }
 
@@ -209,10 +210,8 @@ void Simulation::handleInput(GameData* _gd)
 void Simulation::handleAgentBehaviour(GameData* _gd)
 {
     // Perform all swarm behaviour ..
-    for (SwarmAgent& agent : agents)
+    for (auto& agent : agents)
     {
-        agent.tick(_gd);
-
         int index = posToTileIndex(agent.getPos());
         if (!JHelper::validIndex(index, nav_nodes.size()))
             continue;
@@ -230,6 +229,12 @@ void Simulation::handleAgentBehaviour(GameData* _gd)
         }
 
         agent.steerFromNeighbourAgents(node.getAgentBin());
+    }
+
+    // The move them ..
+    for (auto& agent : agents)
+    {
+        agent.tick(_gd);
     }
 }
 
@@ -318,8 +323,8 @@ void Simulation::updateSwarmDestination()
     // Put indicator in the center of the tile for visual reference.
     DirectX::XMFLOAT3 snap_pos { 0, 0, 0 };
     DirectX::XMINT2 coords = JHelper::calculateCoords(goal_index, level->width);
-    snap_pos.x = coords.x * grid_scale;
-    snap_pos.y = coords.y * grid_scale;
+    snap_pos.x = static_cast<float>(coords.x * grid_scale);
+    snap_pos.y = static_cast<float>(coords.y * grid_scale);
     waypoint_indicator->setPos(snap_pos);
 
     // Debug.
@@ -476,13 +481,18 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
+    float half_scale = static_cast<float>(grid_scale) / 2;
+
     for (int i = 0; i < AGENTS_PER_SPAWN; ++i)
     {
         agent_instance_data.push_back(AgentInstanceData());
         agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
 
+        float rand_x = static_cast<float>(rand() % grid_scale) - half_scale;
+        float rand_y = static_cast<float>(rand() % grid_scale) - half_scale;
+
         auto& agent = agents[agents.size() - 1];
-        agent.setPos(pos.x, pos.y, 0);
+        agent.setPos(pos.x + rand_x, pos.y + rand_y, 0);
         agent.setColor(1, 0, 0, 1);
         agent.attachListener(this);
     }

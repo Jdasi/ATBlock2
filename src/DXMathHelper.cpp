@@ -26,6 +26,18 @@ DirectX::XMFLOAT3 DirectX::Float3SubtractBfromA(const XMFLOAT3& _a, const XMFLOA
 }
 
 
+DirectX::XMFLOAT3 DirectX::Float3Mul(const XMFLOAT3& _a, const int _mul)
+{
+    DirectX::XMFLOAT3 f;
+
+    f.x = _a.x * _mul;
+    f.y = _a.y * _mul;
+    f.z = _a.z * _mul;
+
+    return f;
+}
+
+
 DirectX::XMFLOAT3 DirectX::Float3Mul(const XMFLOAT3& _a, const float _mul)
 {
     DirectX::XMFLOAT3 f;
@@ -33,6 +45,18 @@ DirectX::XMFLOAT3 DirectX::Float3Mul(const XMFLOAT3& _a, const float _mul)
     f.x = _a.x * _mul;
     f.y = _a.y * _mul;
     f.z = _a.z * _mul;
+
+    return f;
+}
+
+
+DirectX::XMFLOAT3 DirectX::Float3Div(const XMFLOAT3& _a, const int _div)
+{
+    DirectX::XMFLOAT3 f;
+
+    f.x = _a.x / _div;
+    f.y = _a.y / _div;
+    f.z = _a.z / _div;
 
     return f;
 }
