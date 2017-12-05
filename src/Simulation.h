@@ -55,6 +55,8 @@ private:
 
     void spawnAgent();
     void steerAgentFromNode(SwarmAgent& _agent, NavNode& _node);
+    void shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node);
+    void keepAgentInBounds(SwarmAgent& _agent);
 
     void onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
         const int _new_index) override;
@@ -85,6 +87,8 @@ private:
 
     std::unique_ptr<Level> level;
     int grid_scale;
+    float half_scale; // Used to resolve center origin offsets.
+    float hundredth_scale; // Used to shift agent positions based on grid size.
 
     // Helper stuff.
     std::unique_ptr<VBGO> cursor;

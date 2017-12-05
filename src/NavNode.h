@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "DXMathHelper.h"
+#include "BoundingBox.h"
 
 class SwarmAgent;
 
@@ -38,6 +39,8 @@ public:
     void setAllNeighbours(const std::vector<NavNode*>& _all_neighbours);
 
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
+    BoxEdge closestEdge(const DirectX::XMFLOAT3& _pos) const;
+    const Bounds& getWorldBounds() const;
 
     int getBinCount() const;
     const std::vector<SwarmAgent*>& getAgentBin() const;
@@ -55,6 +58,8 @@ private:
 
     DirectX::XMFLOAT3 world_pos;
     DirectX::XMFLOAT3 flow_dir;
+
+    BoundingBox bounding_box;
 
     std::vector<NavNode*> adjacent_neighbours;
     std::vector<NavNode*> all_neighbours;

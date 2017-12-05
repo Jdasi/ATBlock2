@@ -40,6 +40,7 @@ void NavNode::setPos(const DirectX::XMFLOAT3& _pos)
 {
     pos = _pos;
     world_pos = DirectX::Float3Mul(_pos, matrix_scale);
+    bounding_box.updateBounds(pos, matrix_scale);
 }
 
 
@@ -142,22 +143,19 @@ void NavNode::setAllNeighbours(const std::vector<NavNode*>& _all_neighbours)
 
 bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
 {
-    float half_scale = static_cast<float>(matrix_scale) / 2;
+    return bounding_box.containsPoint(_pos);
+}
 
-    float left = (pos.x * matrix_scale) - half_scale;
-    float right = left + matrix_scale;
-    float bottom = (pos.y * matrix_scale) - half_scale;
-    float top = bottom + matrix_scale;
 
-    if (right >= _pos.x &&
-        left <= _pos.x &&
-        top >= _pos.y &&
-        bottom <= _pos.y)
-    {
-        return true;
-    }
+BoxEdge NavNode::closestEdge(const DirectX::XMFLOAT3& _pos) const
+{
+    return bounding_box.closestEdge(_pos);
+}
 
-    return false;
+
+const Bounds& NavNode::getWorldBounds() const
+{
+    return bounding_box.getBounds();
 }
 
 

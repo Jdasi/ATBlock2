@@ -23,6 +23,8 @@ Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf
     , agent_world(DirectX::XMMatrixIdentity())
     , nav_world(DirectX::XMMatrixIdentity())
     , grid_scale(5)
+    , half_scale(static_cast<float>(grid_scale) / 2)
+    , hundredth_scale(static_cast<float>(grid_scale) / 100)
     , paused_flag(0)
 {
     agent_instance_data.reserve(MAX_AGENTS);
@@ -39,9 +41,6 @@ Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf
     createConstantBuffers(_renderer);
     createScene(_renderer);
 
-    // Set initial waypoint to grid node 1, 1.
-    int debug_index = JHelper::calculateIndex(1, 1, level->width);
-    cursor->setPos(nav_nodes[debug_index].getWorldPos());
     updateSwarmDestination();
 
     initThreads(_gd);
@@ -237,13 +236,30 @@ void Simulation::initThreads(GameData* _gd)
 void Simulation::handleInput(GameData* _gd)
 {
     if (_gd->input->getActionDown(GameAction::PAUSE))
-        paused_flag ^= 1;
+        paused_flag ^= 1; // Toggle pause.
 
     if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
         spawnAgent();
 
     if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
+
+    if (_gd->input->getKeyDown('C'))
+    {
+        auto& pos = cursor->getPos();
+        int index = posToTileIndex(pos);
+
+        if (JHelper::validIndex(index, nav_nodes.size()))
+        {
+            std::cout << "Cursor pos: " << pos.x << ", " << pos.y << std::endl;
+
+            auto& node = nav_nodes[index];
+            if (!node.isWalkable())
+            {
+                BoxEdge closest_edge = node.closestEdge(pos);
+            }
+        }
+    }
 }
 
 
@@ -283,6 +299,18 @@ void Simulation::agentMovementTick(const float _dt)
     for (auto& agent : agents)
     {
         agent.tick(_dt);
+
+        int index = posToTileIndex(agent.getPos());
+        if (JHelper::validIndex(index, nav_nodes.size()))
+        {
+            auto& node = nav_nodes[index];
+            if (!node.isWalkable())
+            {
+                shuntAgentFromNode(agent, node);
+            }
+        }
+
+        keepAgentInBounds(agent);
     }
 }
 
@@ -382,8 +410,6 @@ void Simulation::updateSwarmDestination()
 
 bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 {
-    float half_scale = grid_scale * 0.5f;
-
     if (_pos.x + half_scale < 0 || _pos.x + half_scale >= level->width * grid_scale ||
         _pos.y + half_scale < 0 || _pos.y + half_scale >= level->height * grid_scale)
     {
@@ -397,8 +423,6 @@ bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 // This does not necessarily return a safe array index.
 int Simulation::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 {
-    float half_scale = grid_scale * 0.5f;
-
     auto offsetx = _pos.x + half_scale;
     int ix = static_cast<int>(offsetx) / grid_scale;
 
@@ -528,8 +552,6 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
-    float half_scale = static_cast<float>(grid_scale) / 2;
-
     for (int i = 0; i < AGENTS_PER_SPAWN; ++i)
     {
         agent_instance_data.push_back(AgentInstanceData());
@@ -541,6 +563,7 @@ void Simulation::spawnAgent()
         auto& agent = agents[agents.size() - 1];
         agent.setPos(pos.x + rand_x, pos.y + rand_y, 0);
         agent.setColor(1, 0, 0, 1);
+        agent.setCurrentTileIndex(index);
         agent.attachListener(this);
     }
 
@@ -556,6 +579,73 @@ void Simulation::steerAgentFromNode(SwarmAgent& _agent, NavNode& _node)
     diff = DirectX::Float3Mul(diff, 100); // Really aggressive repelling force.
 
     _agent.applySteer(diff);
+}
+
+
+void Simulation::shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node)
+{
+    BoxEdge closest_edge = _node.closestEdge(_agent.getPos());
+    auto& bounds = _node.getWorldBounds();
+    auto& agent_pos = _agent.getPos();
+
+    switch (closest_edge)
+    {
+        case BoxEdge::TOP:
+        {
+            _agent.setPos(agent_pos.x, bounds.top + hundredth_scale, 0);
+        } break;
+
+        case BoxEdge::BOTTOM:
+        {
+            _agent.setPos(agent_pos.x, bounds.bottom - hundredth_scale, 0);
+        } break;
+
+        case BoxEdge::LEFT:
+        {
+            _agent.setPos(bounds.left - hundredth_scale, agent_pos.y, 0);
+        } break;
+
+        case BoxEdge::RIGHT:
+        {
+            _agent.setPos(bounds.right + hundredth_scale, agent_pos.y, 0);
+        } break;
+
+        default: {}
+    }
+}
+
+
+void Simulation::keepAgentInBounds(SwarmAgent& _agent)
+{
+    auto& agent_pos = _agent.getPos();
+
+    if (posWithinSimBounds(agent_pos))
+        return;
+
+    float left = 0 - half_scale;
+    float right = left + (grid_scale * level->width);
+    float bottom = 0 - half_scale;
+    float top = bottom + (grid_scale * level->height);
+
+    if (agent_pos.x < left)
+    {
+        _agent.setPos(left + hundredth_scale, agent_pos.y, 0);
+    }
+
+    if (agent_pos.x >= right)
+    {
+        _agent.setPos(right - hundredth_scale, agent_pos.y, 0);
+    }
+
+    if (agent_pos.y < bottom)
+    {
+        _agent.setPos(agent_pos.x, bottom + hundredth_scale, 0);
+    }
+
+    if (agent_pos.y >= top)
+    {
+        _agent.setPos(agent_pos.x, top - hundredth_scale, 0);
+    }
 }
 
 
