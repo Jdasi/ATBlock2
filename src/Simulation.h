@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <atomic>
 
 #include "Renderer.h"
 #include "Vertex.h"
@@ -68,7 +69,7 @@ private:
 
     std::vector<AgentInstanceData> agent_instance_data; // Stuff given to the GPU to draw agents.
     std::vector<SwarmAgent> agents; // Fleshed out agent class with behaviour (uses AgentInstanceData).
-    DirectX::XMMATRIX agent_world = DirectX::XMMatrixIdentity(); // All agents use this world matrix.
+    DirectX::XMMATRIX agent_world; // All agents use this world matrix.
 
     std::unique_ptr<VBModel> agent_model;
 
@@ -76,7 +77,7 @@ private:
     ID3D11Buffer* scene_inst_buff;
 
     std::vector<NavNode> nav_nodes;
-    DirectX::XMMATRIX nav_world = DirectX::XMMatrixIdentity();
+    DirectX::XMMATRIX nav_world;
 
     std::unique_ptr<Level> level;
     int grid_scale;
@@ -85,6 +86,6 @@ private:
     std::unique_ptr<VBGO> cursor;
     std::unique_ptr<VBGO> waypoint_indicator;
 
-    bool paused;
+    std::atomic<int> paused_flag;
 
 };

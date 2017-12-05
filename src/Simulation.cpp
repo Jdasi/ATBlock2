@@ -15,8 +15,14 @@
 Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
+    , cb_cpu(nullptr)
+    , cb_gpu(nullptr)
+    , agent_inst_buff(nullptr)
+    , scene_inst_buff(nullptr)
+    , agent_world(DirectX::XMMatrixIdentity())
+    , nav_world(DirectX::XMMatrixIdentity())
     , grid_scale(5)
-    , paused(false)
+    , paused_flag(0)
 {
     agent_instance_data.reserve(MAX_AGENTS);
     agents.reserve(MAX_AGENTS);
@@ -58,7 +64,7 @@ void Simulation::tick(GameData* _gd)
 
     handleInput(_gd);
 
-    if (!paused)
+    if (!paused_flag)
     {
         waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
         waypoint_indicator->setScale(2 + cos(5 * JTime::getTime()));
@@ -197,7 +203,7 @@ void Simulation::configureAgentInstanceBuffer()
 void Simulation::handleInput(GameData* _gd)
 {
     if (_gd->input->getActionDown(GameAction::PAUSE))
-        paused = !paused;
+        paused_flag ^= 1;
 
     if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
         spawnAgent();
