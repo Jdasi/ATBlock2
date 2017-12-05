@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <DirectXMath.h>
 
 class InputHandler;
@@ -12,7 +14,7 @@ struct GameData
         , camera_pos(0, 0, 0)
     {}
 
-    bool exit;
+    std::atomic<bool> exit;
 
     InputHandler* input;
     DirectX::XMFLOAT3 camera_pos;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <atomic>
+#include <thread>
 
 #include "Renderer.h"
 #include "Vertex.h"
@@ -12,6 +13,7 @@
 #include "SwarmAgent.h"
 #include "NavNode.h"
 #include "Level.h"
+#include "Constants.h"
 
 struct GameData;
 struct DrawData;
@@ -20,7 +22,7 @@ class VBModelFactory;
 class Simulation : public AgentListener
 {
 public:
-    Simulation(Renderer* _renderer, VBModelFactory* _vbmf);
+    Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf);
     ~Simulation();
 
     void tick(GameData* _gd);
@@ -30,9 +32,11 @@ private:
     void createConstantBuffers(Renderer* _renderer);
     void createScene(Renderer* _renderer);
     void configureAgentInstanceBuffer();
+    void initThreads(GameData* _gd);
 
     void handleInput(GameData* _gd);
-    void handleAgentBehaviour(GameData* _gd);
+    void agentBehaviourTick();
+    void agentMovementTick(const float _dt);
 
     void drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context);
     void drawScene(ID3D11Device* _device, ID3D11DeviceContext* _context);
@@ -87,5 +91,9 @@ private:
     std::unique_ptr<VBGO> waypoint_indicator;
 
     std::atomic<int> paused_flag;
+
+    // Thread stuff.
+    std::thread behaviour_thread;
+    std::thread movement_thread;
 
 };

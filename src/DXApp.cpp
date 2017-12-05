@@ -53,7 +53,7 @@ void DXApp::initObjects()
 {
     input_handler = std::make_unique<InputHandler>();
     vbmf = std::make_unique<VBModelFactory>(renderer.get());
-    simulation = std::make_unique<Simulation>(renderer.get(), vbmf.get());
+    simulation = std::make_unique<Simulation>(&game_data, renderer.get(), vbmf.get());
 
     camera = std::make_unique<Camera>(0.4f * 3.14f, window->getAspectRatio(),
         0.1f, 1000.0f, DirectX::Vector3Up, DirectX::Vector3Zero);

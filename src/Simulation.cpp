@@ -10,9 +10,10 @@
 #include "JHelper.h"
 #include "FileIO.h"
 #include "Constants.h"
+#include "SimpleTimer.h"
 
 
-Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
+Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf)
     : renderer(_renderer)
     , vbmf(_vbmf)
     , cb_cpu(nullptr)
@@ -42,6 +43,8 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
     int debug_index = JHelper::calculateIndex(1, 1, level->width);
     cursor->setPos(nav_nodes[debug_index].getWorldPos());
     updateSwarmDestination();
+
+    initThreads(_gd);
 }
 
 
@@ -50,6 +53,9 @@ Simulation::~Simulation()
     SAFE_RELEASE(cb_gpu);
     SAFE_RELEASE(agent_inst_buff);
     SAFE_RELEASE(scene_inst_buff);
+
+    behaviour_thread.join();
+    movement_thread.join();
 }
 
 
@@ -68,8 +74,6 @@ void Simulation::tick(GameData* _gd)
     {
         waypoint_indicator->setRoll(waypoint_indicator->getRoll() - 2 * JTime::getDeltaTime());
         waypoint_indicator->setScale(2 + cos(5 * JTime::getTime()));
-
-        handleAgentBehaviour(_gd);
     }
 
     // Update instance buffer after behaviour tick ..
@@ -200,6 +204,36 @@ void Simulation::configureAgentInstanceBuffer()
 }
 
 
+void Simulation::initThreads(GameData* _gd)
+{
+    behaviour_thread = std::thread([this, _gd]()
+    {
+        while (!_gd->exit)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            agentBehaviourTick();
+        }
+    });
+
+    movement_thread = std::thread([this, _gd]()
+    {
+        SimpleTimer timer;
+        float dt = 0;
+
+        while (!_gd->exit)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            dt = timer.getTimeDifference();
+            timer.reset();
+
+            agentMovementTick(dt);
+        }
+    });
+}
+
+
 void Simulation::handleInput(GameData* _gd)
 {
     if (_gd->input->getActionDown(GameAction::PAUSE))
@@ -213,9 +247,11 @@ void Simulation::handleInput(GameData* _gd)
 }
 
 
-void Simulation::handleAgentBehaviour(GameData* _gd)
+void Simulation::agentBehaviourTick()
 {
-    // Perform all swarm behaviour ..
+    if (paused_flag)
+        return;
+
     for (auto& agent : agents)
     {
         int index = posToTileIndex(agent.getPos());
@@ -236,14 +272,19 @@ void Simulation::handleAgentBehaviour(GameData* _gd)
 
         agent.steerFromNeighbourAgents(node.getAgentBin());
     }
-
-    // The move them ..
-    for (auto& agent : agents)
-    {
-        agent.tick(_gd);
-    }
 }
 
+
+void Simulation::agentMovementTick(const float _dt)
+{
+    if (paused_flag)
+        return;
+
+    for (auto& agent : agents)
+    {
+        agent.tick(_dt);
+    }
+}
 
 void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {

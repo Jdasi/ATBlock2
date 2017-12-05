@@ -13,9 +13,9 @@ SwarmAgent::SwarmAgent(AgentInstanceData& _data)
 }
 
 
-void SwarmAgent::tick(GameData* _gd)
+void SwarmAgent::tick(const float _dt)
 {
-    move(_gd);
+    move(_dt);
 
     // Reset for next tick.
     acceleration.x = 0;
@@ -142,7 +142,7 @@ void SwarmAgent::applySteer(const DirectX::XMFLOAT3& _force)
 }
 
 
-void SwarmAgent::move(GameData* _gd)
+void SwarmAgent::move(const float _dt)
 {
     velocity = DirectX::Float3Add(velocity, acceleration);
 
@@ -153,6 +153,6 @@ void SwarmAgent::move(GameData* _gd)
         velocity = DirectX::Float3Mul(velocity, AGENT_MAX_SPEED);
     }
 
-    DirectX::XMFLOAT3 step = DirectX::Float3Mul(velocity, JTime::getDeltaTime());
+    DirectX::XMFLOAT3 step = DirectX::Float3Mul(velocity, _dt);
     instance_data.pos = DirectX::Float3Add(instance_data.pos, step);
 }

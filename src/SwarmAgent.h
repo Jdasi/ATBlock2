@@ -24,7 +24,7 @@ public:
     SwarmAgent(AgentInstanceData& _data);
     ~SwarmAgent() = default;
 
-    void tick(GameData* _gd);
+    void tick(const float _dt);
 
     void steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neighbours);
     void applySteer(const DirectX::XMFLOAT3& _force);
@@ -43,7 +43,7 @@ public:
     void setCurrentTileIndex(const int _tile_index);
 
 private:
-    void move(GameData* _gd);
+    void move(const float _dt);
 
     AgentInstanceData& instance_data;
 
