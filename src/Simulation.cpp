@@ -20,7 +20,6 @@ Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf
     , cb_gpu(nullptr)
     , agent_inst_buff(nullptr)
     , scene_inst_buff(nullptr)
-    , agent_world(DirectX::XMMatrixIdentity())
     , nav_world(DirectX::XMMatrixIdentity())
     , grid_scale(5)
     , half_scale(static_cast<float>(grid_scale) / 2)
@@ -300,7 +299,7 @@ void Simulation::agentMovementTick(const float _dt)
 void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
     // Update current world.
-    cb_cpu->obj_world = DirectX::XMMatrixTranspose(agent_world);
+    cb_cpu->obj_world = DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity());
     updateConstantBuffer(_device, _context);
 
     // Bind vertex buffer.
@@ -631,6 +630,7 @@ void Simulation::keepAgentInBounds(SwarmAgent& _agent)
 }
 
 
+// Called by an agent when its current tile index changes on a frame.
 void Simulation::onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
     const int _new_index)
 {
