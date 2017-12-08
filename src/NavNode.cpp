@@ -40,7 +40,7 @@ void NavNode::setPos(const DirectX::XMFLOAT3& _pos)
 {
     pos = _pos;
     world_pos = DirectX::Float3Mul(_pos, matrix_scale);
-    bounding_box.updateBounds(pos, matrix_scale);
+    bounding_box.updateBounds(pos, static_cast<float>(matrix_scale));
 }
 
 

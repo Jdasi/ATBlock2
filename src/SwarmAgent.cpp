@@ -8,7 +8,7 @@ SwarmAgent::SwarmAgent(AgentInstanceData& _data)
     : instance_data(_data)
     , velocity(0, 0, 0)
     , acceleration(0, 0, 0)
-    , current_tile_index(0)
+    , current_tile_index(-1)
 {
 }
 
@@ -77,20 +77,6 @@ void SwarmAgent::setPos(const DirectX::XMFLOAT3& _pos)
 void SwarmAgent::setPos(const float _x, const float _y, const float _z)
 {
     setPos(DirectX::XMFLOAT3(_x, _y, _z));
-}
-
-
-void SwarmAgent::adjustPos(const DirectX::XMFLOAT3& _adjustment)
-{
-    adjustPos(_adjustment.x, _adjustment.y, _adjustment.z);
-}
-
-
-void SwarmAgent::adjustPos(const float _x, const float _y, const float _z)
-{
-    instance_data.pos.x += _x;
-    instance_data.pos.y += _y;
-    instance_data.pos.z += _z;
 }
 
 

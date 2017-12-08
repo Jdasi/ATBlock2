@@ -118,7 +118,7 @@ void Simulation::draw(DrawData* _dd)
 
 void Simulation::createConstantBuffers(Renderer* _renderer)
 {
-    auto device = _renderer->getDevice();
+    auto* device = _renderer->getDevice();
 
     // Create constant buffer (gpu side).
     D3D11_BUFFER_DESC cb_desc;
@@ -243,23 +243,6 @@ void Simulation::handleInput(GameData* _gd)
 
     if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
-
-    if (_gd->input->getKeyDown('C'))
-    {
-        auto& pos = cursor->getPos();
-        int index = posToTileIndex(pos);
-
-        if (JHelper::validIndex(index, nav_nodes.size()))
-        {
-            std::cout << "Cursor pos: " << pos.x << ", " << pos.y << std::endl;
-
-            auto& node = nav_nodes[index];
-            if (!node.isWalkable())
-            {
-                BoxEdge closest_edge = node.closestEdge(pos);
-            }
-        }
-    }
 }
 
 
@@ -563,7 +546,6 @@ void Simulation::spawnAgent()
         auto& agent = agents[agents.size() - 1];
         agent.setPos(pos.x + rand_x, pos.y + rand_y, 0);
         agent.setColor(1, 0, 0, 1);
-        agent.setCurrentTileIndex(index);
         agent.attachListener(this);
     }
 
@@ -655,6 +637,8 @@ void Simulation::onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
     auto& prev_node = nav_nodes[_prev_index];
     auto& new_node = nav_nodes[_new_index];
 
-    prev_node.removeAgentPtr(_agent);
+    if (JHelper::validIndex(_prev_index, nav_nodes.size()))
+        prev_node.removeAgentPtr(_agent);
+
     new_node.addAgentPtr(_agent);
 }
