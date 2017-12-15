@@ -12,6 +12,7 @@
 #include "SwarmAgent.h"
 #include "NavNode.h"
 #include "Level.h"
+#include "SimpleTimer.h"
 
 struct GameData;
 struct DrawData;
@@ -87,5 +88,11 @@ private:
     std::unique_ptr<VBGO> waypoint_indicator;
 
     std::atomic<int> paused_flag;
+
+    // PERFORMANCE PROFILING
+    std::vector<SwarmAgent*> neighbours; // DEBUG.
+    SimpleTimer timer;
+    int frame_counter = 0;
+    double calc_time = 0;
 
 };

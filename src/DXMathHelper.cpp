@@ -86,6 +86,18 @@ DirectX::XMFLOAT3 DirectX::Float3Normalized(const XMFLOAT3& _a)
     f.z = _a.z * inv_sqrt;
 
     return f;
+
+    /*
+    DirectX::XMFLOAT3 f;
+
+    float mag = 1 / Float3Magnitude(_a);
+
+    f.x = _a.x * mag;
+    f.y = _a.y * mag;
+    f.z = _a.z * mag;
+
+    return f;
+    */
 }
 
 
@@ -101,6 +113,7 @@ DirectX::XMFLOAT3 DirectX::Float3DirectionAtoB(const XMFLOAT3& _a, const XMFLOAT
 float DirectX::Float3Magnitude(const XMFLOAT3& _a)
 {
     return 1 / JHelper::fisqrt(_a.x * _a.x + _a.y * _a.y + _a.z * _a.z);
+    //return sqrt(_a.x * _a.x + _a.y * _a.y + _a.z * _a.z);
 }
 
 
@@ -114,6 +127,7 @@ float DirectX::Float3Distance(const XMFLOAT3& _a, const XMFLOAT3& _b)
 {
     XMFLOAT3 diff = Float3SubtractBfromA(_a, _b);
     return 1 / JHelper::fisqrt((diff.x * diff.x) + (diff.y * diff.y) + (diff.z * diff.z));
+    //return sqrt((diff.x * diff.x) + (diff.y * diff.y) + (diff.z * diff.z));
 }
 
 

@@ -26,6 +26,7 @@ Simulation::Simulation(Renderer* _renderer, VBModelFactory* _vbmf)
 {
     agent_instance_data.reserve(MAX_AGENTS);
     agents.reserve(MAX_AGENTS);
+    neighbours.reserve(MAX_AGENTS);
 
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
 
@@ -235,7 +236,28 @@ void Simulation::handleAgentBehaviour(GameData* _gd)
         }
 
         agent.steerFromNeighbourAgents(node.getAgentBin());
+        //agent.steerFromNeighbourAgents(neighbours);
     }
+
+    // PERFORMANCE PROFILING. --------------------------------------------------
+    if (agents.size() == MAX_AGENTS)
+    {
+        calc_time += timer.getTimeDifference();
+        timer.reset();
+
+        ++frame_counter;
+
+        const int MEASUREMENT = 1000;
+        if (frame_counter >= MEASUREMENT)
+        {
+            double avg = calc_time / MEASUREMENT;
+            std::cout << "avg calc time: " << avg << std::endl;
+
+            frame_counter = 0;
+            calc_time = 0;
+        }
+    }
+    // PERFORMANCE PROFILING. --------------------------------------------------
 
     // The move them ..
     for (auto& agent : agents)
@@ -332,10 +354,6 @@ void Simulation::updateSwarmDestination()
     snap_pos.x = static_cast<float>(coords.x * grid_scale);
     snap_pos.y = static_cast<float>(coords.y * grid_scale);
     waypoint_indicator->setPos(snap_pos);
-
-    // Debug.
-    std::cout << "Math index: " << goal_index << " -- Tile index: "
-              << nav_nodes[goal_index].getNodeIndex() << std::endl;
 }
 
 
@@ -493,6 +511,7 @@ void Simulation::spawnAgent()
     {
         agent_instance_data.push_back(AgentInstanceData());
         agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
+        neighbours.push_back(&agents[agents.size() - 1]);
 
         float rand_x = static_cast<float>(rand() % grid_scale) - half_scale;
         float rand_y = static_cast<float>(rand() % grid_scale) - half_scale;

@@ -4,8 +4,8 @@
     const int MAX_AGENTS = 5000;
     const int AGENTS_PER_SPAWN = 10;
 #elif RELEASE
-    const int MAX_AGENTS = 100000;
-    const int AGENTS_PER_SPAWN = 100;
+    const int MAX_AGENTS = 50000;
+    const int AGENTS_PER_SPAWN = 10;
 #endif
 
 const float AGENT_MAX_SPEED = 25;
