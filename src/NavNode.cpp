@@ -50,6 +50,7 @@ void NavNode::setPos(const float _x, const float _y, const float _z)
 }
 
 
+// Gets the index of the node in the NavNode array.
 int NavNode::getNodeIndex() const
 {
     return node_index;
@@ -146,7 +147,7 @@ bool NavNode::containsPoint(const DirectX::XMFLOAT3& _pos) const
 }
 
 
-BoxEdge NavNode::closestEdge(const DirectX::XMFLOAT3& _pos) const
+BoundingBox::Edge NavNode::closestEdge(const DirectX::XMFLOAT3& _pos) const
 {
     return bounding_box.closestEdge(_pos);
 }
@@ -170,12 +171,14 @@ const std::vector<SwarmAgent*>& NavNode::getAgentBin() const
 }
 
 
+// Add an agent to this node's bin.
 void NavNode::addAgentPtr(SwarmAgent* _agent)
 {
     agent_bin.push_back(_agent);
 }
 
 
+// Remove an agent from this node's bin.
 void NavNode::removeAgentPtr(SwarmAgent* _agent)
 {
     agent_bin.erase(std::remove_if(

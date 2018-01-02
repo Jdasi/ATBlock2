@@ -35,8 +35,8 @@ void Camera::tick(GameData* _gd)
 
         if (relative_look_at)
         {
-            auto pos = getPos();
-            current_target = XMFLOAT3(pos.x + target.x, pos.y + target.y, pos.z + target.z);
+            auto& pos = getPos();
+            current_target = Float3Add(pos, target);
         }
 
         XMVECTOR eyev = XMLoadFloat3(&getPos());

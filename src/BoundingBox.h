@@ -2,6 +2,8 @@
 
 #include "DXMathHelper.h"
 
+/* Represents the extremeties of a rectangle.
+ */
 struct Bounds
 {
     Bounds()
@@ -18,17 +20,21 @@ struct Bounds
     float bottom;
 };
 
-enum BoxEdge
-{
-    LEFT,
-    RIGHT,
-    TOP,
-    BOTTOM
-};
-
+/* Contains information about the extremeties of a world-space rectangle.
+ * This class should be frequently updated by a rectangular object that requires
+ * collision-checking functionality.
+ */
 class BoundingBox
 {
 public:
+    enum Edge
+    {
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM
+    };
+
     BoundingBox();
     ~BoundingBox() = default;
 
@@ -37,7 +43,7 @@ public:
     void updateScale(const float _scale);
 
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
-    BoxEdge closestEdge(const DirectX::XMFLOAT3& _pos) const;
+    BoundingBox::Edge closestEdge(const DirectX::XMFLOAT3& _pos) const;
 
     const Bounds& getBounds() const;
 

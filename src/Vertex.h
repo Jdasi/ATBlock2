@@ -4,6 +4,9 @@
 
 #include <DirectXMath.h>
 
+/* Data structure which encapsulates details about an object that is
+ * due to be rendered.
+ */
 struct CBPerObject
 {
     DirectX::XMMATRIX obj_world = DirectX::XMMatrixIdentity();
@@ -14,6 +17,11 @@ struct CBPerObject
     DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
 };
 
+/* Data structure which represents a single point in a piece of geometry.
+ * Input Layouts using this structure must follow the format:
+ * 1. Position (Float3)
+ * 2. Colour (Flor4)
+ */
 struct Vertex
 {
     Vertex()

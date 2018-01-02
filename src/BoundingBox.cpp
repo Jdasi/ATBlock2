@@ -9,6 +9,9 @@ BoundingBox::BoundingBox()
 }
 
 
+/* Updates the bounds of the BoundingBox, assuming that the origin of the box
+ * is in the center.
+ */
 void BoundingBox::updateBounds(const DirectX::XMFLOAT3& _pos, const float _scale)
 {
     pos = _pos;
@@ -23,18 +26,26 @@ void BoundingBox::updateBounds(const DirectX::XMFLOAT3& _pos, const float _scale
 }
 
 
+/* Updates the bounds of the BoundingBox, assuming that the origin of the box
+ * is in the center.
+ */
 void BoundingBox::updateBounds(const DirectX::XMFLOAT3& _pos)
 {
     updateBounds(_pos, scale);
 }
 
 
+/* Updates the bounds of the BoundingBox, assuming that the origin of the box
+ * is in the center.
+ */
 void BoundingBox::updateScale(const float _scale)
 {
     updateBounds(pos, _scale);
 }
 
 
+/* Returns true if the BoundingBox contains _pos, otherwise returns false.
+ */
 bool BoundingBox::containsPoint(const DirectX::XMFLOAT3& _pos) const
 {
     if (bounds.right >= _pos.x &&
@@ -49,30 +60,33 @@ bool BoundingBox::containsPoint(const DirectX::XMFLOAT3& _pos) const
 }
 
 
-BoxEdge BoundingBox::closestEdge(const DirectX::XMFLOAT3& _pos) const
+/* Returns the closest Edge of the BoundingBox to _pos.
+ */
+BoundingBox::Edge BoundingBox::closestEdge(const DirectX::XMFLOAT3& _pos) const
 {
+    // Precalculate all differences in the X and Y axis.
     float diff_left = abs(_pos.x - bounds.left);
     float diff_right = abs(_pos.x - bounds.right);
     float diff_top = abs(_pos.y - bounds.top);
     float diff_bottom = abs(_pos.y - bounds.bottom);
 
-    BoxEdge closest_edge = BoxEdge::LEFT;
+    Edge closest_edge = Edge::LEFT;
 
     if (diff_left < diff_right && diff_left < diff_top && diff_left < diff_bottom)
     {
-        closest_edge = BoxEdge::LEFT;
+        closest_edge = Edge::LEFT;
     }
     else if (diff_right < diff_left && diff_right < diff_top && diff_right < diff_bottom)
     {
-        closest_edge = BoxEdge::RIGHT;
+        closest_edge = Edge::RIGHT;
     }
     else if (diff_top < diff_left && diff_top < diff_right && diff_top < diff_bottom)
     {
-        closest_edge = BoxEdge::TOP;
+        closest_edge = Edge::TOP;
     }
     else if (diff_bottom < diff_left && diff_bottom < diff_right && diff_bottom < diff_top)
     {
-        closest_edge = BoxEdge::BOTTOM;
+        closest_edge = Edge::BOTTOM;
     }
 
     return closest_edge;

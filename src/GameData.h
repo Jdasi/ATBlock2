@@ -6,6 +6,9 @@
 
 class InputHandler;
 
+/* Simple structure to pass to objects that need to react to input, or tailor
+ * their logic to the position of the main camera.
+ */
 struct GameData
 {
     GameData()

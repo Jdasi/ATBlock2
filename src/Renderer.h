@@ -10,6 +10,10 @@
 
 class Window;
 
+/* Encapuslates the DirectX11 rendering system and supporting information.
+ * Graphical objects can request information from the Renderer to allow
+ * the object to be drawn correctly.
+ */
 class Renderer
 {
 public:

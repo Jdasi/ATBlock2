@@ -7,6 +7,9 @@
 
 class SwarmAgent;
 
+/* Represents a grid tile for visualisation and spatial partioning,
+ * and a graph node for navigation systems.
+ */
 class NavNode
 {
 public:
@@ -39,7 +42,7 @@ public:
     void setAllNeighbours(const std::vector<NavNode*>& _all_neighbours);
 
     bool containsPoint(const DirectX::XMFLOAT3& _pos) const;
-    BoxEdge closestEdge(const DirectX::XMFLOAT3& _pos) const;
+    BoundingBox::Edge closestEdge(const DirectX::XMFLOAT3& _pos) const;
     const Bounds& getWorldBounds() const;
 
     int getBinCount() const;
@@ -48,22 +51,22 @@ public:
     void removeAgentPtr(SwarmAgent* _agent);
 
 private:
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT4 color;
+    DirectX::XMFLOAT3 pos;      // Where the node is only in relation to other nodes.
+    DirectX::XMFLOAT4 color;    // Colour of grid tile visualisation.
 
-    int node_index;
-    int matrix_scale;
-    bool walkable;
-    int distance;
+    int node_index;             // This node's index in the node array.
+    int matrix_scale;           // Scale of the grid.
+    bool walkable;              // Is this tile traversable?
+    int distance;               // Used in navigation evaluation cycles.
 
-    DirectX::XMFLOAT3 world_pos;
-    DirectX::XMFLOAT3 flow_dir;
+    DirectX::XMFLOAT3 world_pos;    // Where the node is in world space.
+    DirectX::XMFLOAT3 flow_dir;     // Which direction this node is pointing.
 
-    BoundingBox bounding_box;
+    BoundingBox bounding_box;       // Collision volume of the node.
 
-    std::vector<NavNode*> adjacent_neighbours;
-    std::vector<NavNode*> all_neighbours;
+    std::vector<NavNode*> adjacent_neighbours;  // Up, Down, Left, Right Node neighbours.
+    std::vector<NavNode*> all_neighbours;       // Omni-directional Node neighbours.
 
-    std::vector<SwarmAgent*> agent_bin;
+    std::vector<SwarmAgent*> agent_bin; // All the agents currently inside this node.
 
 };

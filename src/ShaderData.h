@@ -6,6 +6,9 @@
 
 #include "DXUtil.h"
 
+/* Contains information required by graphical objects for the purposes of rendering to screen.
+ * DirectX11 data structures are automatically released when this object is destroyed.
+ */
 struct ShaderData
 {
     ShaderData()

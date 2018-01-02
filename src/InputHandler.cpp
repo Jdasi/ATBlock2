@@ -17,7 +17,7 @@ InputHandler::InputHandler()
 }
 
 
-void InputHandler::processMessage(MSG _msg)
+void InputHandler::processMessage(const MSG& _msg)
 {
     switch (_msg.message)
     {
@@ -56,24 +56,24 @@ void InputHandler::lateTick()
 }
 
 
-bool InputHandler::getKey(int _key)
+bool InputHandler::getKey(const int _key)
 {
-    _key = toupper(_key);
-    return keys[_key] && prev_keys[_key];
+    int actual = toupper(_key);
+    return keys[actual] && prev_keys[actual];
 }
 
 
-bool InputHandler::getKeyDown(int _key)
+bool InputHandler::getKeyDown(const int _key)
 {
-    _key = toupper(_key);
-    return keys[_key] && !prev_keys[_key];
+    int actual = toupper(_key);
+    return keys[actual] && !prev_keys[actual];
 }
 
 
-bool InputHandler::getKeyUp(int _key)
+bool InputHandler::getKeyUp(const int _key)
 {
-    _key = toupper(_key);
-    return !keys[_key] && prev_keys[_key];
+    int actual = toupper(_key);
+    return !keys[actual] && prev_keys[actual];
 }
 
 

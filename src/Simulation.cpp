@@ -26,23 +26,7 @@ Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf
     , hundredth_scale(static_cast<float>(grid_scale) / 100)
     , paused_flag(0)
 {
-    agent_instance_data.reserve(settings.getMaxAgents());
-    agents.reserve(settings.getMaxAgents());
-
-    agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
-
-    cursor = std::make_unique<VBGO>(vbmf->createSquare());
-    cursor->setColor(1, 1, 0);
-
-    waypoint_indicator = std::make_unique<VBGO>(vbmf->createSquare());
-    waypoint_indicator->setColor(0, 1, 0);
-
-    createConstantBuffers(_renderer);
-    createScene(_renderer);
-
-    updateSwarmDestination();
-
-    initThreads(_gd);
+    init(_gd, _renderer);
 }
 
 
@@ -115,11 +99,41 @@ void Simulation::draw(DrawData* _dd)
 }
 
 
+void Simulation::init(GameData* _gd, Renderer* _renderer)
+{
+    // Pre-allocate large memory storage.
+    agent_instance_data.reserve(settings.getMaxAgents());
+    agents.reserve(settings.getMaxAgents());
+
+    // Set the main model to be used in the simulation.
+    agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
+
+    // Debug/helper visualisations.
+    cursor = std::make_unique<VBGO>(vbmf->createSquare());
+    cursor->setColor(1, 1, 0);
+
+    waypoint_indicator = std::make_unique<VBGO>(vbmf->createSquare());
+    waypoint_indicator->setColor(0, 1, 0);
+
+    // Buffer and scene stuff.
+    createConstantBuffers(_renderer);
+    createScene(_renderer);
+
+    // Set the initial destination for the swarm.
+    updateSwarmDestination();
+
+    // Start the threads to produce agent movement.
+    initThreads(_gd);
+}
+
+
+/* Create the per-object buffers used to draw the agents and nav nodes.
+ */
 void Simulation::createConstantBuffers(Renderer* _renderer)
 {
     auto* device = _renderer->getDevice();
 
-    // Create constant buffer (gpu side).
+    // Create constant buffer (GPU side).
     D3D11_BUFFER_DESC cb_desc;
     ZeroMemory(&cb_desc, sizeof(D3D11_BUFFER_DESC));
 
@@ -129,7 +143,7 @@ void Simulation::createConstantBuffers(Renderer* _renderer)
     cb_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     cb_desc.MiscFlags = 0;
 
-    // Create constant buffer (cpu side).
+    // Create constant buffer (CPU side).
     cb_cpu = (CBPerObject*)_aligned_malloc(sizeof(CBPerObject), 16);
     ZeroMemory(cb_cpu, sizeof(CBPerObject));
 
@@ -141,6 +155,9 @@ void Simulation::createConstantBuffers(Renderer* _renderer)
 }
 
 
+/* Create and arrange the nav nodes which form the scene visualisation and
+ * navigation graph.
+ */
 void Simulation::createScene(Renderer* _renderer)
 {
     // Load the level from file.
@@ -163,6 +180,7 @@ void Simulation::createScene(Renderer* _renderer)
     ZeroMemory(&scene_inst_res_data, sizeof(scene_inst_res_data));
     scene_inst_res_data.pSysMem = &nav_nodes[0];
 
+    // Initialise and arrange the tiles based on level data.
     for (int row = 0; row < level->height; ++row)
     {
         for (int col = 0; col < level->width; ++col)
@@ -182,6 +200,7 @@ void Simulation::createScene(Renderer* _renderer)
     HRESULT hr = renderer->getDevice()->CreateBuffer(&scene_inst_buff_desc,
         &scene_inst_res_data, &scene_inst_buff);
 
+    // Create the grid scale.
     float grid_scale_f = static_cast<float>(grid_scale);
     DirectX::XMMATRIX scale_mat = DirectX::XMMatrixScaling(grid_scale_f, grid_scale_f, 1);
     nav_world = nav_world * scale_mat;
@@ -237,16 +256,21 @@ void Simulation::handleInput(GameData* _gd)
     if (_gd->input->getActionDown(GameAction::PAUSE))
         paused_flag ^= 1; // Toggle pause.
 
+    // Hold V to spawn agents.
     if (agents.size() < settings.getMaxAgents() && _gd->input->getKey('V'))
-        spawnAgent();
+        spawnAgents();
 
     if (_gd->input->getKeyDown('B'))
         updateSwarmDestination();
 }
 
 
+/* Thread 1:
+ * Generates the steering force to be applied to each swarm agent.
+ */
 void Simulation::agentBehaviourTick()
 {
+    // Don't do anything if paused.
     if (paused_flag)
         return;
 
@@ -273,8 +297,13 @@ void Simulation::agentBehaviourTick()
 }
 
 
+/* Thread 2:
+ * Moves the agent based on their evaluated steering direction.
+ * Agents are kept within the simulation bounds after a move iteration.
+ */
 void Simulation::agentMovementTick(const float _dt)
 {
+    // Don't do anything if paused.
     if (paused_flag)
         return;
 
@@ -295,6 +324,7 @@ void Simulation::agentMovementTick(const float _dt)
         keepAgentInBounds(agent);
     }
 }
+
 
 void Simulation::drawAgents(ID3D11Device* _device, ID3D11DeviceContext* _context)
 {
@@ -364,6 +394,15 @@ void Simulation::updateAgentInstanceBuffer()
 }
 
 
+/* Sets the new destination of the swarm, based on the current position of
+ * the camera (which the cursor tracks).
+ * Unwalkable destinations are ignored.
+ *
+ * Step 1: Steps between nodes is calculated using Dijkstra's algorithm.
+ * Step 2: Flow directions between nodes are calculated.
+ *
+ * A visualisation is then placed at the destination position.
+ */
 void Simulation::updateSwarmDestination()
 {
     auto& pos = cursor->getPos();
@@ -390,6 +429,7 @@ void Simulation::updateSwarmDestination()
 }
 
 
+// Returns true if _pos is within the simulation bounds, otherwise returns false.
 bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 {
     if (_pos.x + half_scale < 0 || _pos.x + half_scale >= level->width * grid_scale ||
@@ -402,7 +442,10 @@ bool Simulation::posWithinSimBounds(const DirectX::XMFLOAT3& _pos)
 }
 
 
-// This does not necessarily return a safe array index.
+/* Uses integer math to calculate the index of a tile based on _pos.
+ * This does not necessarily return a safe array index, as it assumes an infinite
+ * size grid.
+ */
 int Simulation::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 {
     auto offsetx = _pos.x + half_scale;
@@ -416,6 +459,8 @@ int Simulation::posToTileIndex(const DirectX::XMFLOAT3& _pos)
 }
 
 
+/* Generate the number of steps from all locations to the goal.
+ */
 void Simulation::generateDijkstrasDistances(const int _goal_index)
 {
     int UNVISITED = 99999;
@@ -459,6 +504,8 @@ void Simulation::generateDijkstrasDistances(const int _goal_index)
 }
 
 
+/* Generate the steering direction from each node to its neighbours.
+ */
 void Simulation::generateFlowField()
 {
     for (auto& node : nav_nodes)
@@ -467,11 +514,13 @@ void Simulation::generateFlowField()
         if (!node.isWalkable())
             continue;
 
+        // Allow omni-directional travel (use getAdjacentNeighbours for 4 directions).
         auto& neighbours = node.getAllNeighbours();
 
         NavNode* progress_node = nullptr;
         int progress = 0;
 
+        // Find the best progressor node.
         for (auto* neighbour : neighbours)
         {
             int distance = neighbour->getDistance() - node.getDistance();
@@ -486,12 +535,16 @@ void Simulation::generateFlowField()
         if (progress_node == nullptr)
             continue;
 
+        // Point to it.
         DirectX::XMFLOAT3 dir = DirectX::Float3DirectionAtoB(node.getPos(), progress_node->getPos());
         node.setFlowDir(dir);
     }
 }
 
 
+/* Returns a list of neighbours surrounding the _center_tile.
+ * _diagonals can be set to true if testing 8 directions, otherwise set to false for 4 directions.
+ */
 std::vector<NavNode*> Simulation::evaluateNodeNeighbours(const int _center_tile,
     const bool _diagonals)
 {
@@ -511,6 +564,7 @@ std::vector<NavNode*> Simulation::evaluateNodeNeighbours(const int _center_tile,
                 continue;
             }
 
+            // Test for 8 directions.
             int diff = abs(col - coords.x) + abs(row - coords.y);
             if (!_diagonals && diff == 2)
                 continue;
@@ -524,7 +578,11 @@ std::vector<NavNode*> Simulation::evaluateNodeNeighbours(const int _center_tile,
 }
 
 
-void Simulation::spawnAgent()
+/* Spawns agents at the current position of the cursor (which is essentially
+ * the center of the screen, or the camera's position.
+ * The number of agents spawned is set through the SimulationSettings file.
+ */
+void Simulation::spawnAgents()
 {
     auto& pos = cursor->getPos();
     if (!posWithinSimBounds(pos))
@@ -534,12 +592,13 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
-    auto& agent_settings = settings.getAgentSettings();
+    auto& agent_settings = settings.getAgentSettings(); // Shared settings.
     for (unsigned int i = 0; i < settings.getAgentsPerSpawn(); ++i)
     {
         agent_instance_data.push_back(AgentInstanceData());
         agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1], agent_settings));
 
+        // Try to avoid placing agents inside of each other.
         float rand_x = static_cast<float>(rand() % grid_scale) - half_scale;
         float rand_y = static_cast<float>(rand() % grid_scale) - half_scale;
 
@@ -550,10 +609,14 @@ void Simulation::spawnAgent()
 
     std::cout << "Agents spawned, num agents: " << agents.size() << std::endl;
 
+    // Number of agents has changed, update the buffer.
     configureAgentInstanceBuffer();
 }
 
 
+/* Encourages an agent to steer away from a particular node.
+ * The force applied is very aggressive to ensure its force takes priority.
+ */
 void Simulation::steerAgentFromNode(SwarmAgent& _agent, NavNode& _node)
 {
     DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(_agent.getPos(), _node.getWorldPos());
@@ -563,39 +626,30 @@ void Simulation::steerAgentFromNode(SwarmAgent& _agent, NavNode& _node)
 }
 
 
+/* This function assumes the _agent is within _node's bounds, and forcefully moves the agent
+ * to the closest edge of the node, based on the agent's position.
+ */
 void Simulation::shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node)
 {
-    BoxEdge closest_edge = _node.closestEdge(_agent.getPos());
+    BoundingBox::Edge closest_edge = _node.closestEdge(_agent.getPos());
     auto& bounds = _node.getWorldBounds();
     auto& agent_pos = _agent.getPos();
 
     switch (closest_edge)
     {
-        case BoxEdge::TOP:
-        {
-            _agent.setPos(agent_pos.x, bounds.top + hundredth_scale, 0);
-        } break;
-
-        case BoxEdge::BOTTOM:
-        {
-            _agent.setPos(agent_pos.x, bounds.bottom - hundredth_scale, 0);
-        } break;
-
-        case BoxEdge::LEFT:
-        {
-            _agent.setPos(bounds.left - hundredth_scale, agent_pos.y, 0);
-        } break;
-
-        case BoxEdge::RIGHT:
-        {
-            _agent.setPos(bounds.right + hundredth_scale, agent_pos.y, 0);
-        } break;
+        case BoundingBox::TOP:      { _agent.setPos(agent_pos.x, bounds.top + hundredth_scale, 0);      } break;
+        case BoundingBox::BOTTOM:   { _agent.setPos(agent_pos.x, bounds.bottom - hundredth_scale, 0);   } break;
+        case BoundingBox::LEFT:     { _agent.setPos(bounds.left - hundredth_scale, agent_pos.y, 0);     } break;
+        case BoundingBox::RIGHT:    { _agent.setPos(bounds.right + hundredth_scale, agent_pos.y, 0);    } break;
 
         default: {}
     }
 }
 
 
+/* Forcefully moves an agent to the inner edge of the simulation space, if it is
+ * currently outside of it.
+ */
 void Simulation::keepAgentInBounds(SwarmAgent& _agent)
 {
     auto& agent_pos = _agent.getPos();
@@ -612,8 +666,7 @@ void Simulation::keepAgentInBounds(SwarmAgent& _agent)
     {
         _agent.setPos(left + hundredth_scale, agent_pos.y, 0);
     }
-
-    if (agent_pos.x >= right)
+    else if (agent_pos.x >= right)
     {
         _agent.setPos(right - hundredth_scale, agent_pos.y, 0);
     }
@@ -622,8 +675,7 @@ void Simulation::keepAgentInBounds(SwarmAgent& _agent)
     {
         _agent.setPos(agent_pos.x, bottom + hundredth_scale, 0);
     }
-
-    if (agent_pos.y >= top)
+    else if (agent_pos.y >= top)
     {
         _agent.setPos(agent_pos.x, top - hundredth_scale, 0);
     }

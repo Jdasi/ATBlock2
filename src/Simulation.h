@@ -19,6 +19,9 @@ struct GameData;
 struct DrawData;
 class VBModelFactory;
 
+/* Contains all the information required to drive the swarm behaviour and render
+ * it to the screen.
+ */
 class Simulation : public AgentListener
 {
 public:
@@ -29,6 +32,8 @@ public:
     void draw(DrawData* _dd);
 
 private:
+    void init(GameData* _gd, Renderer* _renderer);
+
     void createConstantBuffers(Renderer* _renderer);
     void createScene(Renderer* _renderer);
     void configureAgentInstanceBuffer();
@@ -53,7 +58,7 @@ private:
     std::vector<NavNode*> evaluateNodeNeighbours(const int _center_tile,
         const bool _diagonals = false);
 
-    void spawnAgent();
+    void spawnAgents();
     void steerAgentFromNode(SwarmAgent& _agent, NavNode& _node);
     void shuntAgentFromNode(SwarmAgent& _agent, NavNode& _node);
     void keepAgentInBounds(SwarmAgent& _agent);
@@ -67,11 +72,11 @@ private:
     VBModelFactory* vbmf;
 
     // Constant buffer stuff.
-    ID3D11Buffer* cb_gpu;
-    CBPerObject* cb_cpu;
+    ID3D11Buffer* cb_gpu;           // GPU-side per-object constant buffer.
+    CBPerObject* cb_cpu;            // CPU-side per-object constant buffer.
 
     // Swarm Agent stuff.
-    ID3D11Buffer* agent_inst_buff;
+    ID3D11Buffer* agent_inst_buff;  // GPU buffer for drawing the agent instances.
     D3D11_BUFFER_DESC agent_inst_buff_desc;
     D3D11_SUBRESOURCE_DATA agent_inst_res_data;
 
@@ -81,24 +86,24 @@ private:
     std::unique_ptr<VBModel> agent_model;
 
     // Scene stuff.
-    ID3D11Buffer* scene_inst_buff;
+    ID3D11Buffer* scene_inst_buff;  // GPU buffer for drawing the node instances.
 
     std::vector<NavNode> nav_nodes;
     DirectX::XMMATRIX nav_world;
 
-    std::unique_ptr<Level> level;
-    int grid_scale;
-    float half_scale;                                   // Used to resolve tile center offsets.
-    float hundredth_scale;                              // Used to shift agent positions based on grid size.
+    std::unique_ptr<Level> level;   // Raw data of the level loaded from file.
+    int grid_scale;                 // Size of the grid.
+    float half_scale;               // Used to resolve tile center offsets.
+    float hundredth_scale;          // Used to shift agent positions based on grid size.
 
     // Helper stuff.
-    std::unique_ptr<VBGO> cursor;
-    std::unique_ptr<VBGO> waypoint_indicator;
+    std::unique_ptr<VBGO> cursor;               // Shows where the agents will be spawned.
+    std::unique_ptr<VBGO> waypoint_indicator;   // Shows where the swarm destination is.
 
     std::atomic<int> paused_flag;
 
     // Thread stuff.
-    std::thread behaviour_thread;
-    std::thread movement_thread;
+    std::thread behaviour_thread;   // Determines movement direction of each agent.
+    std::thread movement_thread;    // Actually moves each agent.
 
 };

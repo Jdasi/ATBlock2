@@ -2,6 +2,9 @@
 
 #include <vector>
 
+/* Contains the raw level data as loaded from file.
+ * Other classes may wish to use this data for visualisation and logic.
+ */
 struct Level
 {
     Level()

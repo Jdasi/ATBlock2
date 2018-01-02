@@ -5,10 +5,6 @@
 #include "VBGO.h"
 
 
-// Forward declaration of Window Procedure.
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-
-
 DXApp::DXApp(HINSTANCE _hinstance)
     : hinstance(_hinstance)
     , window(nullptr)
@@ -73,6 +69,8 @@ void DXApp::initObjects()
 }
 
 
+/* Windows application loop.
+ */
 int DXApp::run()
 {
     MSG msg = { 0 };

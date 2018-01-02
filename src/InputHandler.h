@@ -14,12 +14,12 @@ public:
     InputHandler();
     ~InputHandler() = default;
 
-    void processMessage(MSG _msg);
+    void processMessage(const MSG& _msg);
     void lateTick();
 
-    bool getKey(int _key);
-    bool getKeyDown(int _key);
-    bool getKeyUp(int _key);
+    bool getKey(const int _key);
+    bool getKeyDown(const int _key);
+    bool getKeyUp(const int _key);
 
     bool getAction(const GameAction& _action);
     bool getActionDown(const GameAction& _action);

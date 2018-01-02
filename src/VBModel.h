@@ -9,6 +9,15 @@ struct DrawData;
 struct ShaderData;
 struct Vertex;
 
+/* Base class for graphical objects to inherit from.
+ * Contains the information necessary for an object to be rendered to screen.
+ *
+ * Derived classes must implement the createMesh function, else this class
+ * will have nothing to render.
+ *
+ * The VBModelFactory can be used to streamline the process of creating
+ * VBModel instances.
+ */
 class VBModel
 {
 public:

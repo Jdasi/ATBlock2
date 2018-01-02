@@ -2,6 +2,8 @@
 
 #include "DXMathHelper.h"
 
+/* Encapuslates the capabilities and appearance of a SwarmAgent.
+ */
 struct AgentSettings
 {
     AgentSettings()
