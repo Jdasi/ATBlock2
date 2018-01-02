@@ -43,7 +43,7 @@ void SwarmAgent::steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neigh
 
         if (distance_sqr == 0)
         {
-            // Prevent agents occupying the same space.
+            // Discourage agents occupying the same space.
             float rand_x = static_cast<float>(rand() % 1) - 0.5f;
             float rand_y = static_cast<float>(rand() % 1) - 0.5f;
 
@@ -51,6 +51,7 @@ void SwarmAgent::steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neigh
         }
         else
         {
+            // Normal separation force.
             DirectX::XMFLOAT3 diff = DirectX::Float3SubtractBfromA(instance_data.pos, neighbour_pos);
             diff = DirectX::Float3Normalized(diff);
             diff = DirectX::Float3Div(diff, distance_sqr);
@@ -63,18 +64,21 @@ void SwarmAgent::steerFromNeighbourAgents(const std::vector<SwarmAgent*>& _neigh
 }
 
 
+// Returns the world position of the agent.
 const DirectX::XMFLOAT3& SwarmAgent::getPos() const
 {
     return instance_data.pos;
 }
 
 
+// Sets the world position of the agent.
 void SwarmAgent::setPos(const DirectX::XMFLOAT3& _pos)
 {
     instance_data.pos = _pos;
 }
 
 
+// Sets the world position of the agent.
 void SwarmAgent::setPos(const float _x, const float _y, const float _z)
 {
     setPos(DirectX::XMFLOAT3(_x, _y, _z));
@@ -105,6 +109,9 @@ int SwarmAgent::getCurrentTileIndex() const
 }
 
 
+/* Updates the agent's current tile index.
+ * If the index is different, the agent informs any listeners of the change.
+ */
 void SwarmAgent::setCurrentTileIndex(const int _tile_index)
 {
     if (current_tile_index != _tile_index)
@@ -129,6 +136,7 @@ void SwarmAgent::applySteer(const DirectX::XMFLOAT3& _force)
 }
 
 
+// Moves the agent, based on its current velocity.
 void SwarmAgent::move(const float _dt)
 {
     velocity = DirectX::Float3Add(velocity, acceleration);

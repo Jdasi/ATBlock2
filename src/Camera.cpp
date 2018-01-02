@@ -23,27 +23,11 @@ Camera::Camera(const float _fov, const float _ar, const float _near, const float
 
 void Camera::tick(GameData* _gd)
 {
-    using namespace DirectX;
-
     handleInput(_gd);
 
     if (isMatDirty())
     {
-        proj_mat = XMMatrixPerspectiveFovLH(field_of_view, aspect_ratio, near_plane, far_plane);
-
-        XMFLOAT3 current_target = target;
-
-        if (relative_look_at)
-        {
-            auto& pos = getPos();
-            current_target = Float3Add(pos, target);
-        }
-
-        XMVECTOR eyev = XMLoadFloat3(&getPos());
-        XMVECTOR targetv = XMLoadFloat3(&current_target);
-        XMVECTOR upv = XMLoadFloat3(&up);
-
-        view_mat = XMMatrixLookAtLH(eyev, targetv, upv);
+        updateViewProj();
     }
 
     // Base class will clear dirty status.
@@ -77,10 +61,12 @@ const DirectX::XMMATRIX& Camera::getViewMat() const
 }
 
 
+/* Handles camera manipulations from user input.
+ */
 void Camera::handleInput(GameData* _gd)
 {
-    auto pos = getPos();
-    float modifier = abs(pos.z);
+    auto pos = getPos(); // Position before move.
+    float modifier = abs(pos.z); // Move speed is relative to zoom level.
 
     float move_speed = 0.5f * modifier;
     float scroll_speed = 1;
@@ -89,8 +75,7 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(0, move_speed * JTime::getDeltaTime(), 0);
     }
-    
-    if (_gd->input->getAction(GameAction::BACKWARD))
+    else if (_gd->input->getAction(GameAction::BACKWARD))
     {
         adjustPos(0, -(move_speed * JTime::getDeltaTime()), 0);
     }
@@ -99,8 +84,7 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(-(move_speed * JTime::getDeltaTime()), 0, 0);
     }
-    
-    if (_gd->input->getAction(GameAction::RIGHT))
+    else if (_gd->input->getAction(GameAction::RIGHT))
     {
         adjustPos(move_speed * JTime::getDeltaTime(), 0, 0);
     }
@@ -109,8 +93,7 @@ void Camera::handleInput(GameData* _gd)
     {
         adjustPos(0, 0, move_speed * JTime::getDeltaTime());
     }
-
-    if (_gd->input->getAction(GameAction::DOWN))
+    else if (_gd->input->getAction(GameAction::DOWN))
     {
         adjustPos(0, 0, -(move_speed * JTime::getDeltaTime()));
     }
@@ -121,15 +104,43 @@ void Camera::handleInput(GameData* _gd)
         adjustPos(0, 0, scroll * scroll_speed * JTime::getDeltaTime());
     }
 
+    /* Debug.
     if (isMatDirty())
     {
-        //std::cout << "Camera Position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+        std::cout << "Camera Position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
     }
+    */
 
+    // Clamp zoom.
     pos = getPos();
     if (pos.z > -2)
     {
         setPos(pos.x, pos.y, -2);
     }
 
+}
+
+
+/* Recalculates the camera's view and projection matrices, based on the camera's
+ * current position and look target.
+ */
+void Camera::updateViewProj()
+{
+    using namespace DirectX;
+
+    proj_mat = XMMatrixPerspectiveFovLH(field_of_view, aspect_ratio, near_plane, far_plane);
+
+    XMFLOAT3 current_target = target;
+
+    if (relative_look_at)
+    {
+        auto& pos = getPos();
+        current_target = Float3Add(pos, target);
+    }
+
+    XMVECTOR eyev = XMLoadFloat3(&getPos());
+    XMVECTOR targetv = XMLoadFloat3(&current_target);
+    XMVECTOR upv = XMLoadFloat3(&up);
+
+    view_mat = XMMatrixLookAtLH(eyev, targetv, upv);
 }

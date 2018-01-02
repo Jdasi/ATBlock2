@@ -6,6 +6,9 @@
 #include "Square.h"
 #include "Renderer.h"
 
+/* Streamlines the process of creating specialised VBModels.
+ * Does not take ownership of any instances it creates.
+ */
 class VBModelFactory
 {
 public:

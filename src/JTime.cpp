@@ -45,6 +45,9 @@ void JTime::setTimeScale(float _time_scale)
 }
 
 
+/* Calculates the time difference between now and the last time this function was called.
+ * Call this only once each frame to avoid undesired behaviour.
+ */
 void JTime::tick()
 {
     unscaled_delta_time = timer.getTimeDifference();

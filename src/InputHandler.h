@@ -8,6 +8,8 @@
 #include "GameAction.h"
 #include "Keybinding.h"
 
+/* Class for handling input-specific messages that are forwarded by the operating system.
+ */
 class InputHandler
 {
 public:

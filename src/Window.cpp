@@ -20,6 +20,20 @@ bool Window::init(const std::string & _title, const int _width, const int _heigh
     width = _width;
     height = _height;
 
+    if (!registerWindow())
+        return false;
+
+    if (!createWindowHandle(_title))
+        return false;
+
+    ShowWindow(hwnd, SW_SHOW);
+
+    return true;
+}
+
+
+bool Window::registerWindow()
+{
     WNDCLASSEX wcex;
     ZeroMemory(&wcex, sizeof(WNDCLASSEX));
 
@@ -38,28 +52,32 @@ bool Window::init(const std::string & _title, const int _width, const int _heigh
 
     if (!RegisterClassEx(&wcex))
     {
-        OutputDebugString("\n Error: Failed to create window class. \n");
+        OutputDebugString("\n Error: Failed to register window. \n");
         return false;
     }
 
-    RECT r = { 0, 0, _width, _height };
-    AdjustWindowRect(&r, wnd_style, FALSE);
-    UINT width = r.right - r.left;
-    UINT height = r.bottom - r.top;
+    return true;
+}
 
-    UINT x = (GetSystemMetrics(SM_CXSCREEN) / 2) - (width / 2);
-    UINT y = (GetSystemMetrics(SM_CYSCREEN) / 2) - (height / 2);
+
+bool Window::createWindowHandle(const std::string& _title)
+{
+    RECT r = { 0, 0, width, height };
+    AdjustWindowRect(&r, wnd_style, FALSE);
+    UINT rect_width = r.right - r.left;
+    UINT rect_height = r.bottom - r.top;
+
+    UINT x = (GetSystemMetrics(SM_CXSCREEN) / 2) - (rect_width / 2);
+    UINT y = (GetSystemMetrics(SM_CYSCREEN) / 2) - (rect_height / 2);
 
     hwnd = CreateWindow("DXAPP", _title.c_str(), wnd_style,
-        x, y, width, height, NULL, NULL, hinstance, NULL);
+        x, y, rect_width, rect_height, NULL, NULL, hinstance, NULL);
 
     if (!hwnd)
     {
-        OutputDebugString("\n Error: Failed to create window. \n");
+        OutputDebugString("\n Error: Failed to create window handle. \n");
         return false;
     }
-
-    ShowWindow(hwnd, SW_SHOW);
 
     return true;
 }
@@ -71,13 +89,13 @@ HWND& Window::getHandle()
 }
 
 
-const UINT& Window::getWidth() const
+const int& Window::getWidth() const
 {
     return width;
 }
 
 
-const UINT& Window::getHeight() const
+const int& Window::getHeight() const
 {
     return height;
 }

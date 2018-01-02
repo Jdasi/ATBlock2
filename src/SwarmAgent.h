@@ -7,6 +7,9 @@
 
 struct GameData;
 
+/* Contains information about the agent which translates directly onto the GPU-side for rendering.
+ * The layout of this data must match the input layout of the shader that the agent model uses.
+ */
 struct AgentInstanceData
 {
     AgentInstanceData()
@@ -15,8 +18,8 @@ struct AgentInstanceData
     {
     }
 
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT4 color;
+    DirectX::XMFLOAT3 pos;      // World space position of the agent.
+    DirectX::XMFLOAT4 color;    // Colour of the agent.
 };
 
 class SwarmAgent : public ListenerSubject<AgentListener>
@@ -44,12 +47,12 @@ public:
 private:
     void move(const float _dt);
 
-    AgentInstanceData& instance_data;
-    AgentSettings& settings;
+    AgentInstanceData& instance_data;   // Information used by the GPU and CPU.
+    AgentSettings& settings;            // Agent characteristics.
 
     DirectX::XMFLOAT3 velocity;
     DirectX::XMFLOAT3 acceleration;
 
-    int current_tile_index;
+    int current_tile_index;             // E.g. which NavNode bin this agent is in.
 
 };

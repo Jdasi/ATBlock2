@@ -2,6 +2,9 @@
 
 #include "SimpleTimer.h"
 
+/* Static class that measures common useful time-related information.
+ * The tick function assumes it is being called only once per frame.
+ */
 class JTime
 {
 public:

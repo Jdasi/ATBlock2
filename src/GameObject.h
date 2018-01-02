@@ -5,6 +5,9 @@
 struct GameData;
 struct DrawData;
 
+/* Base class for all individual game objects to inherit from.
+ * Uses the dirtyable pattern to minimise unecessary matrix recalculations.
+ */
 class GameObject
 {
 public:

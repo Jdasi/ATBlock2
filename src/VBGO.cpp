@@ -108,6 +108,7 @@ void VBGO::updateConstantBuffers(DrawData* _dd)
 }
 
 
+// Should be called at the end of the program to release shared buffer data.
 void VBGO::cleanUp()
 {
     SAFE_RELEASE(s_cb_gpu);

@@ -2,6 +2,8 @@
 
 #include <DirectXMath.h>
 
+// DirectX maths utility/helper stuff should go here.
+
 namespace DirectX
 {
     static const XMFLOAT3 Vector3Zero      = {  0.f,  0.f,  0.f };

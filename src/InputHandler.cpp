@@ -115,15 +115,15 @@ int InputHandler::getMouseDeltaZ() const
 
 void InputHandler::initKeyBindings()
 {
-    key_bindings.push_back({ GameAction::FORWARD, 'W' });
-    key_bindings.push_back({ GameAction::BACKWARD, 'S' });
-    key_bindings.push_back({ GameAction::LEFT, 'A' });
-    key_bindings.push_back({ GameAction::RIGHT, 'D' });
-    key_bindings.push_back({ GameAction::UP, 'E' });
-    key_bindings.push_back({ GameAction::DOWN, 'Q' });
-    key_bindings.push_back({ GameAction::ACCEPT, VK_RETURN });
-    key_bindings.push_back({ GameAction::PAUSE, 'P' });
-    key_bindings.push_back({ GameAction::QUIT, VK_ESCAPE });
+    key_bindings.push_back({ GameAction::FORWARD,   'W' });
+    key_bindings.push_back({ GameAction::BACKWARD,  'S' });
+    key_bindings.push_back({ GameAction::LEFT,      'A' });
+    key_bindings.push_back({ GameAction::RIGHT,     'D' });
+    key_bindings.push_back({ GameAction::UP,        'E' });
+    key_bindings.push_back({ GameAction::DOWN,      'Q' });
+    key_bindings.push_back({ GameAction::ACCEPT,    VK_RETURN });
+    key_bindings.push_back({ GameAction::PAUSE,     'P' });
+    key_bindings.push_back({ GameAction::QUIT,      VK_ESCAPE });
 
     sortKeyBindings();
 }

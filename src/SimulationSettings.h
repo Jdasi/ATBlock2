@@ -4,6 +4,9 @@
 
 #include "AgentSettings.h"
 
+/* Contains information parsed from the SimulationSettings.txt file.
+ * The settings file is parsed internally, therefore the data can only be retrieved.
+ */
 class SimulationSettings
 {
 public:

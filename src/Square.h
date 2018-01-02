@@ -2,6 +2,8 @@
 
 #include "VBModel.h"
 
+/* Specialised VBModel that resembles a square shape.
+ */
 class Square : public VBModel
 {
 public:

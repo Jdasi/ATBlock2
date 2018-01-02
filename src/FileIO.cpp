@@ -33,18 +33,24 @@ Level FileIO::loadLevel(const std::string& _file_name)
 }
 
 
+/* Returns a map of string key value pairs, representing the settings read in from
+ * the file with the passed name.
+ * This is raw information which will need to be parsed by specialised classes.
+ */
 std::map<std::string, std::string> FileIO::loadSettings(const std::string& _file_name)
 {
     std::string path("Resources/" + _file_name);
     std::map<std::string, std::string> settings;
 
+    // Open the settings file, or create a default one if it can't be found.
     std::ifstream file(path);
     if (!file.is_open())
     {
-        FileIO::createDefaultSettingsFile();
+        FileIO::createDefaultSettingsFile(_file_name);
         file.open(path);
     }
 
+    // Process the settings file.
     std::string line;
     while (std::getline(file, line))
     {
@@ -60,17 +66,27 @@ std::map<std::string, std::string> FileIO::loadSettings(const std::string& _file
 }
 
 
-void FileIO::createDefaultSettingsFile()
+/* Creates a settings file with default values, if a layout has been hardcoded
+ * for a file with the passed name.
+ */
+void FileIO::createDefaultSettingsFile(const std::string& _file_name)
 {
-    std::ofstream file("Resources/SimulationSettings.txt");
+    if (_file_name == "SimulationSettings.txt")
+    {
+        std::ofstream file("Resources/SimulationSettings.txt");
 
-    file
-        << "level = level2.txt"
-        << "max_agents=50000"
-        << "agents_per_spawn=100"
-        << "agent_speed=25"
-        << "agent_steer=1"
-        << "agent_separation=1";
+        file
+            << "level=level2.txt\n"
+            << "max_agents=50000\n"
+            << "agents_per_spawn=100\n"
+            << "agent_speed=25\n"
+            << "agent_steer=1\n"
+            << "agent_separation=1\n";
 
-    file.close();
+        file.close();
+    }
+    else
+    {
+        throw std::runtime_error("No default settings provided for " + _file_name);
+    }
 }

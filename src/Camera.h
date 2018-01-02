@@ -2,6 +2,9 @@
 
 #include "GameObject.h"
 
+/* A specialised GameObject that calculates projection and view matrices, and can
+ * be used to view objects in world space.
+ */
 class Camera : public GameObject
 {
 public:
@@ -20,6 +23,7 @@ public:
 
 protected:
     void handleInput(GameData* _gd);
+    void updateViewProj();
 
     DirectX::XMMATRIX proj_mat;
     DirectX::XMMATRIX view_mat;
