@@ -31,6 +31,7 @@
     <ClCompile Include="..\src\NavNode.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\SimpleTimer.cpp" />
+    <ClCompile Include="..\src\SimulationSettings.cpp" />
     <ClCompile Include="..\src\Square.cpp" />
     <ClCompile Include="..\src\SwarmAgent.cpp" />
     <ClCompile Include="..\src\Simulation.cpp" />
@@ -42,9 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AgentListener.h" />
+    <ClInclude Include="..\src\AgentSettings.h" />
     <ClInclude Include="..\src\BoundingBox.h" />
     <ClInclude Include="..\src\Camera.h" />
-    <ClInclude Include="..\src\Constants.h" />
     <ClInclude Include="..\src\Core.h" />
     <ClInclude Include="..\src\DrawData.h" />
     <ClInclude Include="..\src\DXApp.h" />
@@ -64,6 +65,7 @@
     <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\ShaderData.h" />
     <ClInclude Include="..\src\SimpleTimer.h" />
+    <ClInclude Include="..\src\SimulationSettings.h" />
     <ClInclude Include="..\src\Square.h" />
     <ClInclude Include="..\src\SwarmAgent.h" />
     <ClInclude Include="..\src\Simulation.h" />

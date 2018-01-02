@@ -3,10 +3,9 @@
 #include <algorithm>
 
 #include "NavNode.h"
-#include "Constants.h"
 
 
-NavNode::NavNode(const int _matrix_scale)
+NavNode::NavNode(const int _matrix_scale, const int _max_agents)
     : pos(0, 0, 0)
     , color(0, 0, 0, 1)
     , node_index(0)
@@ -17,7 +16,7 @@ NavNode::NavNode(const int _matrix_scale)
 {
     setWalkable(true);
 
-    agent_bin.reserve(MAX_AGENTS);
+    agent_bin.reserve(_max_agents);
 }
 
 

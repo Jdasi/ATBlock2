@@ -3,6 +3,7 @@
 #include "DXMathHelper.h"
 #include "ListenerSubject.h"
 #include "AgentListener.h"
+#include "AgentSettings.h"
 
 struct GameData;
 
@@ -21,7 +22,7 @@ struct AgentInstanceData
 class SwarmAgent : public ListenerSubject<AgentListener>
 {
 public:
-    SwarmAgent(AgentInstanceData& _data);
+    SwarmAgent(AgentInstanceData& _data, AgentSettings& _settings);
     ~SwarmAgent() = default;
 
     void tick(const float _dt);
@@ -44,6 +45,7 @@ private:
     void move(const float _dt);
 
     AgentInstanceData& instance_data;
+    AgentSettings& settings;
 
     DirectX::XMFLOAT3 velocity;
     DirectX::XMFLOAT3 acceleration;

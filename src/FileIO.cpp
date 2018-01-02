@@ -31,3 +31,46 @@ Level FileIO::loadLevel(const std::string& _file_name)
 
     return level;
 }
+
+
+std::map<std::string, std::string> FileIO::loadSettings(const std::string& _file_name)
+{
+    std::string path("Resources/" + _file_name);
+    std::map<std::string, std::string> settings;
+
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        FileIO::createDefaultSettingsFile();
+        file.open(path);
+    }
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        int pos = line.find_first_of('=');
+
+        std::string key = line.substr(0, pos);
+        std::string val = line.substr(pos + 1);
+
+        settings[key] = val;
+    }
+
+    return settings;
+}
+
+
+void FileIO::createDefaultSettingsFile()
+{
+    std::ofstream file("Resources/SimulationSettings.txt");
+
+    file
+        << "level = level2.txt"
+        << "max_agents=50000"
+        << "agents_per_spawn=100"
+        << "agent_speed=25"
+        << "agent_steer=1"
+        << "agent_separation=1";
+
+    file.close();
+}

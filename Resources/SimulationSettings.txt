@@ -1,0 +1,6 @@
+level=level2.txt
+max_agents=50000
+agents_per_spawn=100
+agent_speed=25
+agent_steer=1
+agent_separation=1

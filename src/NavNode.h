@@ -10,7 +10,7 @@ class SwarmAgent;
 class NavNode
 {
 public:
-    NavNode(const int _matrix_scale);
+    NavNode(const int _matrix_scale, const int _max_agents);
     ~NavNode() = default;
 
     const DirectX::XMFLOAT3& getPos() const;

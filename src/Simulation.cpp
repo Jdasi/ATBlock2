@@ -9,12 +9,12 @@
 #include "JTime.h"
 #include "JHelper.h"
 #include "FileIO.h"
-#include "Constants.h"
 #include "SimpleTimer.h"
 
 
 Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf)
-    : renderer(_renderer)
+    : settings()
+    , renderer(_renderer)
     , vbmf(_vbmf)
     , cb_cpu(nullptr)
     , cb_gpu(nullptr)
@@ -26,8 +26,8 @@ Simulation::Simulation(GameData* _gd, Renderer* _renderer, VBModelFactory* _vbmf
     , hundredth_scale(static_cast<float>(grid_scale) / 100)
     , paused_flag(0)
 {
-    agent_instance_data.reserve(MAX_AGENTS);
-    agents.reserve(MAX_AGENTS);
+    agent_instance_data.reserve(settings.getMaxAgents());
+    agents.reserve(settings.getMaxAgents());
 
     agent_model = vbmf->createSquare(Renderer::ShaderType::INSTANCED);
 
@@ -144,11 +144,11 @@ void Simulation::createConstantBuffers(Renderer* _renderer)
 void Simulation::createScene(Renderer* _renderer)
 {
     // Load the level from file.
-    level = std::make_unique<Level>(FileIO::loadLevel("level2.txt"));
+    level = std::make_unique<Level>(FileIO::loadLevel(settings.getLevelName()));
 
     // Create the grid tiles (aka Navigation Nodes).
     int grid_size = level->width * level->height;
-    nav_nodes.assign(grid_size, NavNode(grid_scale));
+    nav_nodes.assign(grid_size, NavNode(grid_scale, settings.getMaxAgents()));
 
     // Instance buffer to render the grid tiles.
     D3D11_BUFFER_DESC scene_inst_buff_desc;
@@ -237,7 +237,7 @@ void Simulation::handleInput(GameData* _gd)
     if (_gd->input->getActionDown(GameAction::PAUSE))
         paused_flag ^= 1; // Toggle pause.
 
-    if (agents.size() < MAX_AGENTS && _gd->input->getKey('V'))
+    if (agents.size() < settings.getMaxAgents() && _gd->input->getKey('V'))
         spawnAgent();
 
     if (_gd->input->getKeyDown('B'))
@@ -534,17 +534,17 @@ void Simulation::spawnAgent()
     if (!nav_nodes[index].isWalkable())
         return;
 
-    for (int i = 0; i < AGENTS_PER_SPAWN; ++i)
+    auto& agent_settings = settings.getAgentSettings();
+    for (unsigned int i = 0; i < settings.getAgentsPerSpawn(); ++i)
     {
         agent_instance_data.push_back(AgentInstanceData());
-        agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1]));
+        agents.push_back(SwarmAgent(agent_instance_data[agent_instance_data.size() - 1], agent_settings));
 
         float rand_x = static_cast<float>(rand() % grid_scale) - half_scale;
         float rand_y = static_cast<float>(rand() % grid_scale) - half_scale;
 
         auto& agent = agents[agents.size() - 1];
         agent.setPos(pos.x + rand_x, pos.y + rand_y, 0);
-        agent.setColor(1, 0, 0, 1);
         agent.attachListener(this);
     }
 

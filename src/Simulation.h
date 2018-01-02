@@ -5,6 +5,7 @@
 #include <atomic>
 #include <thread>
 
+#include "SimulationSettings.h"
 #include "Renderer.h"
 #include "Vertex.h"
 #include "VBModel.h"
@@ -13,7 +14,6 @@
 #include "SwarmAgent.h"
 #include "NavNode.h"
 #include "Level.h"
-#include "Constants.h"
 
 struct GameData;
 struct DrawData;
@@ -61,6 +61,8 @@ private:
     void onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
         const int _new_index) override;
 
+    SimulationSettings settings;
+
     Renderer* renderer;
     VBModelFactory* vbmf;
 
@@ -74,7 +76,7 @@ private:
     D3D11_SUBRESOURCE_DATA agent_inst_res_data;
 
     std::vector<AgentInstanceData> agent_instance_data; // Stuff given to the GPU to draw agents.
-    std::vector<SwarmAgent> agents; // Fleshed out agent class with behaviour (uses AgentInstanceData).
+    std::vector<SwarmAgent> agents;                     // Fleshed out agent class with behaviour (uses AgentInstanceData).
 
     std::unique_ptr<VBModel> agent_model;
 
@@ -86,8 +88,8 @@ private:
 
     std::unique_ptr<Level> level;
     int grid_scale;
-    float half_scale; // Used to resolve center origin offsets.
-    float hundredth_scale; // Used to shift agent positions based on grid size.
+    float half_scale;                                   // Used to resolve tile center offsets.
+    float hundredth_scale;                              // Used to shift agent positions based on grid size.
 
     // Helper stuff.
     std::unique_ptr<VBGO> cursor;

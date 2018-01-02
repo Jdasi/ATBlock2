@@ -80,6 +80,9 @@
     <ClCompile Include="..\src\BoundingBox.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SimulationSettings.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -166,13 +169,16 @@
     <ClInclude Include="..\src\AgentListener.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Constants.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Simulation.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\src\BoundingBox.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SimulationSettings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\AgentSettings.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
