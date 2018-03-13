@@ -686,11 +686,12 @@ void Simulation::keepAgentInBounds(SwarmAgent& _agent)
 void Simulation::onTileIndexChanged(SwarmAgent* _agent, const int _prev_index,
     const int _new_index)
 {
-    auto& prev_node = nav_nodes[_prev_index];
-    auto& new_node = nav_nodes[_new_index];
-
     if (JHelper::validIndex(_prev_index, nav_nodes.size()))
+    {
+        auto& prev_node = nav_nodes[_prev_index];
         prev_node.removeAgentPtr(_agent);
+    }
 
+    auto& new_node = nav_nodes[_new_index];
     new_node.addAgentPtr(_agent);
 }
