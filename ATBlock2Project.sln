@@ -6,22 +6,13 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DXApp", "DXApp\DXApp.vcxproj", "{53F9440E-393D-4DA1-9C51-B710910817F9}"
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{53F9440E-393D-4DA1-9C51-B710910817F9}.Debug|x64.ActiveCfg = Debug|x64
-		{53F9440E-393D-4DA1-9C51-B710910817F9}.Debug|x64.Build.0 = Debug|x64
 		{53F9440E-393D-4DA1-9C51-B710910817F9}.Debug|x86.ActiveCfg = Debug|Win32
 		{53F9440E-393D-4DA1-9C51-B710910817F9}.Debug|x86.Build.0 = Debug|Win32
-		{53F9440E-393D-4DA1-9C51-B710910817F9}.Release|x64.ActiveCfg = Release|x64
-		{53F9440E-393D-4DA1-9C51-B710910817F9}.Release|x64.Build.0 = Release|x64
 		{53F9440E-393D-4DA1-9C51-B710910817F9}.Release|x86.ActiveCfg = Release|Win32
 		{53F9440E-393D-4DA1-9C51-B710910817F9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
@@ -30,6 +21,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39140711-EB18-47F4-B12F-1EA168911FA0}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
